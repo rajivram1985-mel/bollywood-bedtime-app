@@ -1,7 +1,8 @@
-import { API_BASE_URL } from "../config";
+const ELEVENLABS_BASE = "https://api.elevenlabs.io/v1";
+const ANTHROPIC_BASE = "https://api.anthropic.com/v1";
 
 export async function fetchVoices(apiKey) {
-  const res = await fetch(`${API_BASE_URL}/api/voices`, {
+  const res = await fetch(`${ELEVENLABS_BASE}/voices`, {
     headers: { "xi-api-key": apiKey },
   });
   if (res.status === 401) throw new Error("INVALID_KEY");
@@ -54,15 +55,26 @@ RULES:
 
 Write the bedtime story now:`;
 
-  const res = await fetch(`${API_BASE_URL}/api/generate-story`, {
+  const res = await fetch(`${ANTHROPIC_BASE}/messages`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": anthropicKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true",
+    },
     body: JSON.stringify({
-      anthropicKey,
+      model: "claude-sonnet-4-5-20250929",
+      max_tokens: 4096,
       messages: [{ role: "user", content: storyPrompt }],
     }),
   });
-  if (!res.ok) throw new Error("Failed to generate story");
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(
+      errData?.error?.message || "Failed to generate story"
+    );
+  }
   const data = await res.json();
   const text = data.content.map((b) => b.text || "").join("\n");
   if (!text) throw new Error("No story generated");
@@ -70,27 +82,40 @@ Write the bedtime story now:`;
 }
 
 export async function generateAudioBase64(apiKey, voiceId, text) {
-  const res = await fetch(`${API_BASE_URL}/api/tts-base64/${voiceId}`, {
-    method: "POST",
-    headers: {
-      "xi-api-key": apiKey,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      text,
-      model_id: "eleven_multilingual_v2",
-      voice_settings: {
-        stability: 0.6,
-        similarity_boost: 0.75,
-        style: 0.4,
-        use_speaker_boost: true,
+  const res = await fetch(
+    `${ELEVENLABS_BASE}/text-to-speech/${voiceId}`,
+    {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json",
+        Accept: "audio/mpeg",
       },
-    }),
-  });
+      body: JSON.stringify({
+        text,
+        model_id: "eleven_multilingual_v2",
+        voice_settings: {
+          stability: 0.6,
+          similarity_boost: 0.75,
+          style: 0.4,
+          use_speaker_boost: true,
+        },
+      }),
+    }
+  );
   if (!res.ok) {
     const errData = await res.json().catch(() => ({}));
     throw new Error(errData?.detail?.message || "Failed to generate audio");
   }
-  const data = await res.json();
-  return data.audio; // base64 string
+  const blob = await res.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      // data:audio/mpeg;base64,<data> — strip the prefix
+      const base64 = reader.result.split(",")[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
 }

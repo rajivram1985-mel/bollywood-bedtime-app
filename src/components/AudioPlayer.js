@@ -45,8 +45,10 @@ export default function AudioPlayer({ audioUri }) {
         await soundRef.current.unloadAsync();
         soundRef.current = null;
       }
+      // audioUri can be a URI string or a bundled asset ref (number from require())
+      const source = typeof audioUri === "number" ? audioUri : { uri: audioUri };
       const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: audioUri },
+        source,
         { shouldPlay: false },
         onPlaybackStatusUpdate
       );
