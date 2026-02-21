@@ -7,6 +7,10 @@ import Svg, { Rect, Path } from "react-native-svg";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
+const TIMER_OPTIONS = [15, 30, 45, 60];
+const FADE_STEPS = 50;
+const FADE_INTERVAL_MS = 100; // 50 steps × 100 ms = 5 second fade
+
 function formatTime(s) {
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);
@@ -19,6 +23,13 @@ export default function AudioPlayer({ audioUri }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isSliding, setIsSliding] = useState(false);
+
+  // Sleep timer
+  const [timerMins, setTimerMins] = useState(null); // null = off
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [isFading, setIsFading] = useState(false);
+  const timerIntervalRef = useRef(null);
+  const fadeIntervalRef = useRef(null);
 
   const onPlaybackStatusUpdate = useCallback(
     (status) => {
@@ -40,12 +51,17 @@ export default function AudioPlayer({ audioUri }) {
     let sound;
     (async () => {
       if (!audioUri) return;
-      // Unload previous sound
+      // Reset timer when the track changes
+      clearInterval(timerIntervalRef.current);
+      clearInterval(fadeIntervalRef.current);
+      setTimerMins(null);
+      setTimeLeft(0);
+      setIsFading(false);
+
       if (soundRef.current) {
         await soundRef.current.unloadAsync();
         soundRef.current = null;
       }
-      // audioUri can be a URI string or a bundled asset ref (number from require())
       const source = typeof audioUri === "number" ? audioUri : { uri: audioUri };
       const { sound: newSound } = await Audio.Sound.createAsync(
         source,
@@ -57,18 +73,70 @@ export default function AudioPlayer({ audioUri }) {
     })();
 
     return () => {
-      if (sound) {
-        sound.unloadAsync();
-      }
+      if (sound) sound.unloadAsync();
     };
   }, [audioUri]);
 
-  // Update the callback on the existing sound when isSliding changes
   useEffect(() => {
     if (soundRef.current) {
       soundRef.current.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
     }
   }, [onPlaybackStatusUpdate]);
+
+  // Clean up intervals on unmount
+  useEffect(() => {
+    return () => {
+      clearInterval(timerIntervalRef.current);
+      clearInterval(fadeIntervalRef.current);
+    };
+  }, []);
+
+  const startFadeOut = useCallback(async () => {
+    if (!soundRef.current) return;
+    setIsFading(true);
+    let step = 0;
+    fadeIntervalRef.current = setInterval(async () => {
+      step++;
+      const vol = Math.max(0, 1 - step / FADE_STEPS);
+      await soundRef.current?.setVolumeAsync(vol);
+      if (step >= FADE_STEPS) {
+        clearInterval(fadeIntervalRef.current);
+        await soundRef.current?.pauseAsync();
+        await soundRef.current?.setVolumeAsync(1.0);
+        setIsPlaying(false);
+        setIsFading(false);
+        setTimerMins(null);
+        setTimeLeft(0);
+      }
+    }, FADE_INTERVAL_MS);
+  }, []);
+
+  const activateTimer = (mins) => {
+    clearInterval(timerIntervalRef.current);
+    clearInterval(fadeIntervalRef.current);
+    if (soundRef.current) soundRef.current.setVolumeAsync(1.0);
+    setIsFading(false);
+
+    if (mins === null) {
+      setTimerMins(null);
+      setTimeLeft(0);
+      return;
+    }
+
+    setTimerMins(mins);
+    setTimeLeft(mins * 60);
+
+    timerIntervalRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerIntervalRef.current);
+          startFadeOut();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
   const togglePlay = async () => {
     if (!soundRef.current) return;
@@ -90,15 +158,20 @@ export default function AudioPlayer({ audioUri }) {
   };
 
   const onValueChange = (value) => {
-    if (isSliding) {
-      setCurrentTime(value);
-    }
+    if (isSliding) setCurrentTime(value);
   };
 
   if (!audioUri) return null;
 
+  const timerLabel = isFading
+    ? "🌙 Fading out…"
+    : timerMins
+    ? `⏳ ${formatTime(timeLeft)} remaining`
+    : "🌙 Sleep timer";
+
   return (
     <View style={styles.container}>
+      {/* Playback row */}
       <View style={styles.row}>
         <Pressable onPress={togglePlay}>
           <LinearGradient
@@ -108,12 +181,12 @@ export default function AudioPlayer({ audioUri }) {
             style={styles.playButton}
           >
             {isPlaying ? (
-              <Svg width={20} height={20} viewBox="0 0 20 20" fill="white">
+              <Svg width={20} height={20} viewBox="0 0 20 20">
                 <Rect x={4} y={2} width={4} height={16} rx={1} fill="white" />
                 <Rect x={12} y={2} width={4} height={16} rx={1} fill="white" />
               </Svg>
             ) : (
-              <Svg width={20} height={20} viewBox="0 0 20 20" fill="white">
+              <Svg width={20} height={20} viewBox="0 0 20 20">
                 <Path d="M5 2l12 8-12 8V2z" fill="white" />
               </Svg>
             )}
@@ -137,6 +210,40 @@ export default function AudioPlayer({ audioUri }) {
           />
         </View>
       </View>
+
+      {/* Sleep timer row */}
+      <View style={styles.timerSection}>
+        <Text style={styles.timerLabel}>{timerLabel}</Text>
+        <View style={styles.timerOptions}>
+          {TIMER_OPTIONS.map((mins) => {
+            const active = timerMins === mins;
+            return (
+              <Pressable
+                key={mins}
+                onPress={() => activateTimer(active ? null : mins)}
+                style={[styles.timerPill, active && styles.timerPillActive]}
+              >
+                <Text
+                  style={[
+                    styles.timerPillText,
+                    active && styles.timerPillTextActive,
+                  ]}
+                >
+                  {mins}m
+                </Text>
+              </Pressable>
+            );
+          })}
+          {timerMins !== null && (
+            <Pressable
+              onPress={() => activateTimer(null)}
+              style={styles.cancelBtn}
+            >
+              <Text style={styles.cancelText}>✕</Text>
+            </Pressable>
+          )}
+        </View>
+      </View>
     </View>
   );
 }
@@ -148,7 +255,10 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 1,
     borderColor: colors.borderGold,
+    gap: 16,
   },
+
+  // Playback
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -178,5 +288,59 @@ const styles = StyleSheet.create({
   slider: {
     width: "100%",
     height: 30,
+  },
+
+  // Sleep timer
+  timerSection: {
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderGoldFaint,
+    gap: 10,
+  },
+  timerLabel: {
+    fontFamily: fonts.body,
+    fontSize: 12,
+    color: colors.textTertiary,
+    letterSpacing: 0.4,
+  },
+  timerOptions: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
+  timerPill: {
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.borderGoldSubtle,
+    backgroundColor: "rgba(255,255,255,0.04)",
+  },
+  timerPillActive: {
+    backgroundColor: "rgba(246,166,35,0.18)",
+    borderColor: colors.gold,
+  },
+  timerPillText: {
+    fontFamily: fonts.bodySemiBold,
+    fontSize: 12,
+    color: colors.textSecondary,
+  },
+  timerPillTextActive: {
+    color: colors.gold,
+  },
+  cancelBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "rgba(255,255,255,0.06)",
+    borderWidth: 1,
+    borderColor: colors.borderGoldSubtle,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cancelText: {
+    fontSize: 11,
+    color: colors.textTertiary,
   },
 });
