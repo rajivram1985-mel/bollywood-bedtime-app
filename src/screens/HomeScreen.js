@@ -11,7 +11,7 @@ import WhySection from "../components/WhySection";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
-export default function HomeScreen() {
+export default function HomeScreen({ onResetOnboarding }) {
   const [currentStory, setCurrentStory] = useState(null);
   const [audioUri, setAudioUri] = useState(null);
   const [showStoryText, setShowStoryText] = useState(false);
@@ -37,7 +37,9 @@ export default function HomeScreen() {
         >
           {/* Header */}
           <Animated.View entering={FadeInDown.duration(400)} style={styles.header}>
-            <Text style={styles.moonEmoji}>{"\ud83c\udf19"}</Text>
+            <Pressable onLongPress={onResetOnboarding} delayLongPress={800}>
+              <Text style={styles.moonEmoji}>{"\ud83c\udf19"}</Text>
+            </Pressable>
             <Text style={styles.titleMask}>Bollywood Bedtime</Text>
             <Text style={styles.subtitle}>
               Turn any movie into a sleepy-time story

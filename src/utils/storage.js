@@ -10,6 +10,7 @@ export const STORAGE_KEYS = {
   VOICE_ID: "selected-voice-id",
   SAVED_STORIES: "saved-stories",
   AGE_RANGE: "age-range",
+  ONBOARDING_DONE: "onboarding-done",
 };
 
 // --- Secure storage (API keys) ---
