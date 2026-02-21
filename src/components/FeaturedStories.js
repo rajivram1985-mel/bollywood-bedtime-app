@@ -10,6 +10,11 @@ const MOVIE_EMOJIS = {
   "3 Idiots": "🎓",
   "Kuch Kuch Hota Hai": "💫",
   "Lagaan": "🏏",
+  "Taare Zameen Par": "🎨",
+  "Dangal": "🤼",
+  "Bajrangi Bhaijaan": "🙏",
+  "Pathaan": "🕵️",
+  "Jawan": "👮",
 };
 
 export default function FeaturedStories({ onSelect }) {

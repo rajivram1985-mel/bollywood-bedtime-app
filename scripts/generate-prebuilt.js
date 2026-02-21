@@ -55,11 +55,16 @@ if (!ANTHROPIC_KEY || !ELEVENLABS_KEY || !VOICE_ID) {
 
 // ─── Movies to pre-generate ───────────────────────────────────────────────────
 const MOVIES = [
-  { name: "DDLJ",               filename: "ddlj"   },
-  { name: "Sholay",             filename: "sholay" },
+  { name: "DDLJ",               filename: "ddlj"    },
+  { name: "Sholay",             filename: "sholay"  },
   { name: "3 Idiots",           filename: "3idiots" },
-  { name: "Kuch Kuch Hota Hai", filename: "kkhh"   },
-  { name: "Lagaan",             filename: "lagaan" },
+  { name: "Kuch Kuch Hota Hai", filename: "kkhh"    },
+  { name: "Lagaan",             filename: "lagaan"  },
+  { name: "Taare Zameen Par",   filename: "tzp"     },
+  { name: "Dangal",             filename: "dangal"  },
+  { name: "Bajrangi Bhaijaan",  filename: "bajrangi"},
+  { name: "Pathaan",            filename: "pathaan" },
+  { name: "Jawan",              filename: "jawan"   },
 ];
 
 const AGE_RANGE = "6-8";
@@ -159,14 +164,38 @@ async function generateAudio(text) {
   return Buffer.from(await res.arrayBuffer());
 }
 
+// ─── Load existing story texts from cache ────────────────────────────────────
+function loadCache() {
+  const cachePath = path.join(__dirname, "..", "assets", "audio", "stories-cache.json");
+  if (fs.existsSync(cachePath)) {
+    return JSON.parse(fs.readFileSync(cachePath, "utf8"));
+  }
+  return {};
+}
+
+function saveCache(cache) {
+  const cachePath = path.join(__dirname, "..", "assets", "audio", "stories-cache.json");
+  fs.writeFileSync(cachePath, JSON.stringify(cache, null, 2));
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 async function main() {
   const audioDir = path.join(__dirname, "..", "assets", "audio");
   if (!fs.existsSync(audioDir)) fs.mkdirSync(audioDir, { recursive: true });
 
+  const cache = loadCache();
   const results = [];
 
   for (const movie of MOVIES) {
+    const audioPath = path.join(audioDir, `${movie.filename}.mp3`);
+    const alreadyDone = fs.existsSync(audioPath) && cache[movie.filename];
+
+    if (alreadyDone) {
+      console.log(`\n⏭️   ${movie.name} (skipping — already generated)`);
+      results.push({ movieName: movie.name, filename: movie.filename, text: cache[movie.filename] });
+      continue;
+    }
+
     console.log(`\n🎬  ${movie.name}`);
 
     // Story
@@ -178,9 +207,11 @@ async function main() {
     // Audio
     process.stdout.write("    🎙️  Generating audio... ");
     const audioBuffer = await generateAudio(text);
-    const audioPath = path.join(audioDir, `${movie.filename}.mp3`);
     fs.writeFileSync(audioPath, audioBuffer);
     console.log(`done (${(audioBuffer.length / 1024).toFixed(0)} KB)`);
+
+    cache[movie.filename] = text;
+    saveCache(cache);
 
     results.push({ movieName: movie.name, filename: movie.filename, text });
   }

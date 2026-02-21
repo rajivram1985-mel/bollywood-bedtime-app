@@ -1,12 +1,12 @@
 import { useState, useCallback } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet, SafeAreaView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import MaskedView from "@react-native-masked-view/masked-view";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 
 import NightSky from "../components/NightSky";
 import AudioPlayer from "../components/AudioPlayer";
 import FeaturedStories from "../components/FeaturedStories";
+import WhySection from "../components/WhySection";
 
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
@@ -38,26 +38,10 @@ export default function HomeScreen() {
           {/* Header */}
           <Animated.View entering={FadeInDown.duration(400)} style={styles.header}>
             <Text style={styles.moonEmoji}>{"\ud83c\udf19"}</Text>
-            <View>
-              <MaskedView
-                maskElement={
-                  <Text style={styles.titleMask}>Bollywood Bedtime</Text>
-                }
-              >
-                <LinearGradient
-                  colors={[colors.goldLight, colors.gold, colors.orange]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <Text style={[styles.titleMask, { opacity: 0 }]}>
-                    Bollywood Bedtime
-                  </Text>
-                </LinearGradient>
-              </MaskedView>
-              <Text style={styles.subtitle}>
-                Turn any movie into a sleepy-time story
-              </Text>
-            </View>
+            <Text style={styles.titleMask}>Bollywood Bedtime</Text>
+            <Text style={styles.subtitle}>
+              Turn any movie into a sleepy-time story
+            </Text>
           </Animated.View>
 
           {/* Content */}
@@ -88,6 +72,9 @@ export default function HomeScreen() {
 
             {/* Featured stories */}
             <FeaturedStories onSelect={loadPrebuiltStory} />
+
+            {/* Why sections */}
+            <WhySection />
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -113,27 +100,30 @@ const styles = StyleSheet.create({
   // Header
   header: {
     paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 16,
+    paddingTop: 40,
+    paddingBottom: 28,
     borderBottomWidth: 1,
     borderBottomColor: colors.borderGoldFaint,
-    flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 8,
   },
   moonEmoji: {
-    fontSize: 32,
+    fontSize: 52,
+    marginBottom: 4,
   },
   titleMask: {
     fontFamily: fonts.heading,
-    fontSize: 24,
-    lineHeight: 32,
+    fontSize: 42,
+    lineHeight: 52,
+    textAlign: "center",
+    color: colors.goldLight,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 14,
     color: colors.textTertiary,
     letterSpacing: 0.5,
     fontFamily: fonts.body,
+    textAlign: "center",
   },
 
   // Content
