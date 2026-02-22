@@ -23,6 +23,15 @@ async function searchPoster(searchTitle, year) {
 }
 
 /**
+ * Fetch poster URL for a single movie by name.
+ * Used for on-demand generated stories.
+ */
+export async function fetchMoviePoster(movieName) {
+  if (!TMDB_KEY) return null;
+  return searchPoster(movieName).catch(() => null);
+}
+
+/**
  * Fetch poster URLs for all movies in movieMeta.
  * Results are cached in AsyncStorage so TMDB is only hit once.
  * Returns an object keyed by movieName → poster URL string.

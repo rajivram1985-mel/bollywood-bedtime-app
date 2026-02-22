@@ -65,8 +65,10 @@ function PosterCard({ story, meta, posterUrl, onSelect }) {
   );
 }
 
+const MY_STORIES_KEY = "my-stories";
+
 // ─── Main component ────────────────────────────────────────────────────────────
-export default function FeaturedStories({ onSelect }) {
+export default function FeaturedStories({ onSelect, generatedStories = [], onDeleteGenerated }) {
   const [activeKey, setActiveKey] = useState(GENRE_SECTIONS[0].key);
   const [posters, setPosters] = useState({});
 
@@ -74,35 +76,55 @@ export default function FeaturedStories({ onSelect }) {
     fetchAllPosters(MOVIE_METADATA).then(setPosters).catch(() => {});
   }, []);
 
+  // Switch to My Stories tab automatically when first story is saved
+  const prevCount = useMemo(() => generatedStories.length, []);
+  useEffect(() => {
+    if (generatedStories.length > 0 && prevCount === 0) {
+      setActiveKey(MY_STORIES_KEY);
+    }
+  }, [generatedStories.length]);
+
   const storyMap = useMemo(() => {
     const map = {};
     PREBUILT_STORIES.forEach((s) => { map[s.movieName] = s; });
     return map;
   }, []);
 
+  const isMyStories = activeKey === MY_STORIES_KEY;
   const activeSection = GENRE_SECTIONS.find((s) => s.key === activeKey);
-  const activeStories = activeSection?.movies.map((n) => storyMap[n]).filter(Boolean) ?? [];
+  const activeStories = isMyStories
+    ? generatedStories
+    : (activeSection?.movies.map((n) => storyMap[n]).filter(Boolean) ?? []);
 
   if (PREBUILT_STORIES.length === 0) return null;
 
+  const allTabs = [
+    ...GENRE_SECTIONS,
+    ...(generatedStories.length > 0
+      ? [{ key: MY_STORIES_KEY, label: "My Stories", emoji: "📖" }]
+      : []),
+  ];
+
   return (
     <View style={styles.container}>
-      {/* Genre tab pills */}
+      {/* Tab pills */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.tabRow}
       >
-        {GENRE_SECTIONS.map((section) => {
+        {allTabs.map((section) => {
           const active = activeKey === section.key;
+          const isMyTab = section.key === MY_STORIES_KEY;
           return (
             <Pressable
               key={section.key}
               onPress={() => setActiveKey(section.key)}
-              style={[styles.tab, active && styles.tabActive]}
+              style={[styles.tab, active && styles.tabActive, isMyTab && !active && styles.tabMine]}
             >
               <Text style={[styles.tabText, active && styles.tabTextActive]}>
                 {section.emoji}  {section.label}
+                {isMyTab && ` (${generatedStories.length})`}
               </Text>
             </Pressable>
           );
@@ -112,15 +134,29 @@ export default function FeaturedStories({ onSelect }) {
       {/* Movie poster grid */}
       <View style={styles.grid}>
         {activeStories.map((story) => (
-          <PosterCard
-            key={story.movieName}
-            story={story}
-            meta={MOVIE_METADATA[story.movieName]}
-            posterUrl={posters[story.movieName]}
-            onSelect={onSelect}
-          />
+          <View key={story.movieName} style={styles.cardWrapper}>
+            <PosterCard
+              story={story}
+              meta={MOVIE_METADATA[story.movieName] ?? { emoji: "🎬" }}
+              posterUrl={isMyStories ? story.posterUrl : posters[story.movieName]}
+              onSelect={onSelect}
+            />
+            {isMyStories && (
+              <Pressable
+                onPress={() => onDeleteGenerated?.(story.movieName)}
+                style={styles.deleteBtn}
+                hitSlop={6}
+              >
+                <Text style={styles.deleteBtnText}>✕</Text>
+              </Pressable>
+            )}
+          </View>
         ))}
       </View>
+
+      {isMyStories && generatedStories.length === 0 && (
+        <Text style={styles.emptyText}>No saved stories yet. Generate one above!</Text>
+      )}
     </View>
   );
 }
@@ -157,6 +193,12 @@ const styles = StyleSheet.create({
     color: "#1a0a00",
   },
 
+  // My Stories tab variant
+  tabMine: {
+    borderColor: "rgba(150,100,255,0.4)",
+    backgroundColor: "rgba(150,100,255,0.07)",
+  },
+
   // Grid
   grid: {
     flexDirection: "row",
@@ -164,10 +206,45 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 
-  // Poster card
-  card: {
+  // Card wrapper (for positioning the delete button)
+  cardWrapper: {
     flexBasis: "47%",
     flexGrow: 1,
+    position: "relative",
+  },
+
+  // Delete button (My Stories tab only)
+  deleteBtn: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+  },
+  deleteBtnText: {
+    fontSize: 10,
+    color: "rgba(255,255,255,0.8)",
+  },
+
+  // Empty state
+  emptyText: {
+    fontFamily: fonts.body,
+    fontSize: 13,
+    color: colors.textTertiary,
+    textAlign: "center",
+    paddingVertical: 20,
+  },
+
+  // Poster card
+  card: {
+    width: "100%",
     aspectRatio: 2 / 3,
     borderRadius: 14,
     overflow: "hidden",

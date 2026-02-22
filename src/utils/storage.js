@@ -9,6 +9,7 @@ export const STORAGE_KEYS = {
   ANTHROPIC_KEY: "anthropic-api-key",
   VOICE_ID: "selected-voice-id",
   SAVED_STORIES: "saved-stories",
+  GENERATED_STORIES: "generated-stories",
   AGE_RANGE: "age-range",
   ONBOARDING_DONE: "onboarding-done",
 };

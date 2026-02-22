@@ -21,7 +21,8 @@ function formatTime(s) {
   return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 
-// Pulsing bar while speaking
+// ─── Animated wave bars ─────────────────────────────────────────────────────
+
 function PulseBar({ delay, isPlaying }) {
   const height = useSharedValue(4);
 
@@ -30,7 +31,7 @@ function PulseBar({ delay, isPlaying }) {
       height.value = withRepeat(
         withSequence(
           withTiming(20 + Math.random() * 14, { duration: 280 + delay }),
-          withTiming(4, { duration: 280 + delay })
+          withTiming(4,                        { duration: 280 + delay })
         ),
         -1,
         true
@@ -40,10 +41,7 @@ function PulseBar({ delay, isPlaying }) {
     }
   }, [isPlaying]);
 
-  const style = useAnimatedStyle(() => ({
-    height: height.value,
-  }));
-
+  const style = useAnimatedStyle(() => ({ height: height.value }));
   return <Animated.View style={[styles.pulseBar, style]} />;
 }
 
@@ -57,18 +55,20 @@ function WaveVisualiser({ isPlaying }) {
   );
 }
 
+// ─── Main component ──────────────────────────────────────────────────────────
+
 export default function SpeechPlayer({ text }) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [elapsed, setElapsed] = useState(0);
+  const [elapsed, setElapsed]     = useState(0);
 
   // Sleep timer
-  const [timerMins, setTimerMins] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [isFading, setIsFading] = useState(false);
+  const [timerMins, setTimerMins]   = useState(null);
+  const [timeLeft, setTimeLeft]     = useState(0);
+  const [isFading, setIsFading]     = useState(false);
 
-  const elapsedRef = useRef(null);
+  const elapsedRef      = useRef(null);
   const timerIntervalRef = useRef(null);
-  const fadeIntervalRef = useRef(null);
+  const fadeIntervalRef  = useRef(null);
 
   // Elapsed counter
   useEffect(() => {
@@ -92,28 +92,35 @@ export default function SpeechPlayer({ text }) {
 
   const startSpeaking = () => {
     Speech.speak(text, {
-      rate: 0.85,
-      pitch: 0.95,
-      language: "en-IN",
-      onStart: () => setIsPlaying(true),
-      onDone: () => { setIsPlaying(false); setElapsed(0); },
+      // Slower pace + slightly lower pitch = warm, cosy storytelling feel
+      rate:     0.78,
+      pitch:    0.90,
+      language: "en-US",
+      onStart:   () => setIsPlaying(true),
+      onDone:    () => { setIsPlaying(false); setElapsed(0); },
       onStopped: () => setIsPlaying(false),
-      onError: () => setIsPlaying(false),
+      onError:   () => setIsPlaying(false),
     });
   };
 
   const togglePlay = async () => {
-    const speaking = await Speech.isSpeakingAsync();
-    if (speaking) {
-      Speech.stop();
-      setIsPlaying(false);
-    } else {
+    try {
+      const speaking = await Speech.isSpeakingAsync();
+      if (speaking) {
+        Speech.stop();
+        setIsPlaying(false);
+      } else {
+        setElapsed(0);
+        startSpeaking();
+      }
+    } catch {
+      // isSpeakingAsync can fail on some platforms; just speak
       setElapsed(0);
       startSpeaking();
     }
   };
 
-  // Sleep timer fade-out — for speech we just stop after a brief pause
+  // Sleep timer — stop speech after a short fade pause
   const startFadeOut = () => {
     setIsFading(true);
     let steps = 0;
@@ -127,7 +134,7 @@ export default function SpeechPlayer({ text }) {
         setTimerMins(null);
         setTimeLeft(0);
       }
-    }, 500); // 5-second fade out (10 × 500ms)
+    }, 500);
   };
 
   const activateTimer = (mins) => {
@@ -190,9 +197,13 @@ export default function SpeechPlayer({ text }) {
 
         <View style={styles.rightArea}>
           <View style={styles.statusRow}>
-            <Text style={styles.deviceLabel}>🔊 Device voice</Text>
+            <Text style={styles.deviceLabel}>🎙️ Storyteller</Text>
             <Text style={styles.elapsedText}>
-              {isPlaying ? formatTime(elapsed) : elapsed > 0 ? `${formatTime(elapsed)} paused` : ""}
+              {isPlaying
+                ? formatTime(elapsed)
+                : elapsed > 0
+                ? `${formatTime(elapsed)} paused`
+                : ""}
             </Text>
           </View>
           <WaveVisualiser isPlaying={isPlaying} />
@@ -290,7 +301,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
 
-  // Sleep timer — identical to AudioPlayer
+  // Sleep timer
   timerSection: {
     paddingTop: 14,
     borderTopWidth: 1,

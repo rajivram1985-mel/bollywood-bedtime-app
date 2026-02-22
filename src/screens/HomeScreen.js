@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet, SafeAreaView, useWindowDimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
@@ -6,9 +6,11 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import NightSky from "../components/NightSky";
 import AudioPlayer from "../components/AudioPlayer";
 import SpeechPlayer from "../components/SpeechPlayer";
+import GenerateStory from "../components/GenerateStory";
 import FeaturedStories from "../components/FeaturedStories";
 import WhySection from "../components/WhySection";
 
+import { getData, setData, STORAGE_KEYS } from "../utils/storage";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
@@ -21,11 +23,44 @@ export default function HomeScreen({ onResetOnboarding }) {
   const [currentStory, setCurrentStory] = useState(null);
   const [audioUri, setAudioUri] = useState(null);
   const [showStoryText, setShowStoryText] = useState(false);
+  const [generatedStories, setGeneratedStories] = useState([]);
+
+  // Load saved generated stories on mount
+  useEffect(() => {
+    getData(STORAGE_KEYS.GENERATED_STORIES).then((val) => {
+      if (val) setGeneratedStories(JSON.parse(val));
+    });
+  }, []);
 
   const loadPrebuiltStory = useCallback((story) => {
     setCurrentStory({ movieName: story.movieName, text: story.text });
     setAudioUri(story.audio);
     setShowStoryText(false);
+  }, []);
+
+  const loadGeneratedStory = useCallback((story) => {
+    setCurrentStory({ movieName: story.movieName, text: story.text });
+    setAudioUri(null);
+    setShowStoryText(false);
+  }, []);
+
+  // Called after a new story is generated — saves it and plays it
+  const handleGenerated = useCallback((story) => {
+    loadGeneratedStory(story);
+    setGeneratedStories((prev) => {
+      const filtered = prev.filter((s) => s.movieName !== story.movieName);
+      const updated = [{ ...story, savedAt: new Date().toISOString() }, ...filtered];
+      setData(STORAGE_KEYS.GENERATED_STORIES, JSON.stringify(updated));
+      return updated;
+    });
+  }, [loadGeneratedStory]);
+
+  const deleteGeneratedStory = useCallback((movieName) => {
+    setGeneratedStories((prev) => {
+      const updated = prev.filter((s) => s.movieName !== movieName);
+      setData(STORAGE_KEYS.GENERATED_STORIES, JSON.stringify(updated));
+      return updated;
+    });
   }, []);
 
   const closePlayer = useCallback(() => {
@@ -98,10 +133,11 @@ export default function HomeScreen({ onResetOnboarding }) {
                 <WhySection section="sleep" compact />
               </View>
 
-              {/* Centre: player + movie cards */}
+              {/* Centre: player + generate + movie cards */}
               <View style={styles.centerCol}>
                 {playerSection}
-                <FeaturedStories onSelect={loadPrebuiltStory} />
+                <GenerateStory onGenerated={handleGenerated} />
+                <FeaturedStories onSelect={loadPrebuiltStory} generatedStories={generatedStories} onDeleteGenerated={deleteGeneratedStory} />
               </View>
 
               {/* Right sidebar: Why Bollywood */}
@@ -112,7 +148,8 @@ export default function HomeScreen({ onResetOnboarding }) {
           ) : (
             <View style={styles.narrowBody}>
               {playerSection}
-              <FeaturedStories onSelect={loadPrebuiltStory} />
+              <GenerateStory onGenerated={handleGenerated} />
+              <FeaturedStories onSelect={loadPrebuiltStory} generatedStories={generatedStories} onDeleteGenerated={deleteGeneratedStory} />
               <WhySection />
             </View>
           )}

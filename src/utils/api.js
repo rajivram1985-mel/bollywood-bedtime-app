@@ -37,6 +37,8 @@ const AGE_CONFIG = {
 };
 
 export async function generateStory(anthropicKey, movieName, ageRange = "6-8") {
+  const key = anthropicKey || process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
+  if (!key) throw new Error("No Anthropic API key available.");
   const age = AGE_CONFIG[ageRange] || AGE_CONFIG["6-8"];
 
   const storyPrompt = `You are a warm, loving parent telling a bedtime story to ${age.audience} based on the Bollywood movie "${movieName}".
@@ -59,12 +61,12 @@ Write the bedtime story now:`;
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": anthropicKey,
+      "x-api-key": key,
       "anthropic-version": "2023-06-01",
       "anthropic-dangerous-direct-browser-access": "true",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-5-20250929",
+      model: "claude-sonnet-4-6",
       max_tokens: 4096,
       messages: [{ role: "user", content: storyPrompt }],
     }),
