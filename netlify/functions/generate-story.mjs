@@ -51,7 +51,12 @@ export default async (req) => {
 
   const age = AGE_CONFIG[ageRange] || AGE_CONFIG["6-8"];
 
-  const storyPrompt = `You are a warm, loving parent telling a bedtime story to ${age.audience} based on the Bollywood movie "${movieName}".
+  const storyPrompt = `FIRST, validate the movie name. If "${movieName}" is not a real Bollywood film — for example random characters, gibberish, or clearly not a film title — respond with EXACTLY one line and nothing else:
+NOT_A_FILM: <one short, friendly sentence explaining why, addressed to the parent>
+
+Otherwise, ignore the above and proceed with the bedtime story below.
+
+You are a warm, loving parent telling a bedtime story to ${age.audience} based on the Bollywood movie "${movieName}".
 
 RULES:
 - Rewrite the movie's plot as a cozy, fun bedtime story (${age.wordCount} words)
