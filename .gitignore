@@ -44,3 +44,8 @@ yarn-error.*
 # Local Netlify folder
 .netlify
 deno.lock
+
+# Local design-iteration source materials (not part of the app)
+/bollywood-bedtime-round3/
+/bollywood-bedtime-round3.tar.gz
+/Replit suggestions.txt

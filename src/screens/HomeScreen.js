@@ -25,7 +25,6 @@ export default function HomeScreen({ onResetOnboarding }) {
   const [showStoryText, setShowStoryText] = useState(false);
   const [generatedStories, setGeneratedStories] = useState([]);
 
-  // Load saved generated stories on mount
   useEffect(() => {
     getData(STORAGE_KEYS.GENERATED_STORIES).then((val) => {
       if (val) setGeneratedStories(JSON.parse(val));
@@ -44,7 +43,6 @@ export default function HomeScreen({ onResetOnboarding }) {
     setShowStoryText(false);
   }, []);
 
-  // Called after a new story is generated — saves it and plays it
   const handleGenerated = useCallback((story) => {
     loadGeneratedStory(story);
     setGeneratedStories((prev) => {
@@ -101,6 +99,36 @@ export default function HomeScreen({ onResetOnboarding }) {
     </Animated.View>
   );
 
+  // Main column — film grid is the hero, generate-your-own is secondary
+  const mainColumn = (
+    <>
+      {playerSection}
+      <FeaturedStories
+        onSelect={loadPrebuiltStory}
+        generatedStories={generatedStories}
+        onDeleteGenerated={deleteGeneratedStory}
+      />
+      <View style={styles.spacer} />
+      <GenerateStory onGenerated={handleGenerated} />
+    </>
+  );
+
+  // Marketing/why content moved out of sidebars and into a single
+  // full-width footer section so the film grid takes centre stage.
+  const marketingFooter = (
+    <View style={isWide ? styles.marketingFooterWide : styles.marketingFooterNarrow}>
+      <View style={styles.marketingDivider} />
+      <View style={isWide ? styles.marketingRow : styles.marketingCol}>
+        <View style={styles.marketingCell}>
+          <WhySection section="sleep" compact />
+        </View>
+        <View style={styles.marketingCell}>
+          <WhySection section="bollywood" compact />
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <LinearGradient
       colors={[colors.bgTop, colors.bgMid1, colors.bgMid2, colors.bgBottom]}
@@ -114,7 +142,7 @@ export default function HomeScreen({ onResetOnboarding }) {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Header — always full width */}
+          {/* Header */}
           <Animated.View entering={FadeInDown.duration(400)} style={styles.header}>
             <Pressable onLongPress={onResetOnboarding} delayLongPress={800}>
               <Text style={styles.moonEmoji}>{"\ud83c\udf19"}</Text>
@@ -125,34 +153,13 @@ export default function HomeScreen({ onResetOnboarding }) {
             </Text>
           </Animated.View>
 
-          {/* Body — 3-column on wide, single column on narrow */}
-          {isWide ? (
-            <View style={styles.wideBody}>
-              {/* Left sidebar: Why bedtime stories */}
-              <View style={styles.sidebar}>
-                <WhySection section="sleep" compact />
-              </View>
+          {/* Main body — film grid is the hero on every breakpoint */}
+          <View style={isWide ? styles.wideBody : styles.narrowBody}>
+            {mainColumn}
+          </View>
 
-              {/* Centre: player + generate + movie cards */}
-              <View style={styles.centerCol}>
-                {playerSection}
-                <GenerateStory onGenerated={handleGenerated} />
-                <FeaturedStories onSelect={loadPrebuiltStory} generatedStories={generatedStories} onDeleteGenerated={deleteGeneratedStory} />
-              </View>
-
-              {/* Right sidebar: Why Bollywood */}
-              <View style={styles.sidebar}>
-                <WhySection section="bollywood" compact />
-              </View>
-            </View>
-          ) : (
-            <View style={styles.narrowBody}>
-              {playerSection}
-              <GenerateStory onGenerated={handleGenerated} />
-              <FeaturedStories onSelect={loadPrebuiltStory} generatedStories={generatedStories} onDeleteGenerated={deleteGeneratedStory} />
-              <WhySection />
-            </View>
-          )}
+          {/* Marketing copy demoted to a footer below the grid */}
+          {marketingFooter}
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -194,27 +201,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  // ── Wide layout (≥900px) ───────────────────────────────────────────────────
+  // ── Wide layout (≥900px) — single centred column, no sidebars ─────────────
   wideBody: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    paddingHorizontal: 24,
-    paddingTop: 28,
-    maxWidth: 1300,
+    paddingHorizontal: 28,
+    paddingTop: 32,
+    maxWidth: 880,
     alignSelf: "center",
     width: "100%",
-    gap: 28,
-  },
-  sidebar: {
-    width: 230,
-    flexShrink: 0,
-    paddingTop: 4,
-    borderRightWidth: 0,
-  },
-  centerCol: {
-    flex: 1,
-    minWidth: 0,
-    gap: 0,
   },
 
   // ── Narrow layout (<900px) ─────────────────────────────────────────────────
@@ -224,6 +217,47 @@ const styles = StyleSheet.create({
     maxWidth: 700,
     alignSelf: "center",
     width: "100%",
+  },
+
+  // Spacer between film grid (hero) and the generate block (secondary)
+  spacer: {
+    height: 28,
+  },
+
+  // ── Marketing footer ──────────────────────────────────────────────────────
+  marketingFooterWide: {
+    paddingHorizontal: 28,
+    paddingTop: 12,
+    maxWidth: 1100,
+    alignSelf: "center",
+    width: "100%",
+    marginTop: 16,
+  },
+  marketingFooterNarrow: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    maxWidth: 700,
+    alignSelf: "center",
+    width: "100%",
+    marginTop: 16,
+  },
+  marketingDivider: {
+    height: 1,
+    backgroundColor: colors.borderGoldFaint,
+    marginBottom: 32,
+  },
+  marketingRow: {
+    flexDirection: "row",
+    gap: 32,
+    alignItems: "flex-start",
+  },
+  marketingCol: {
+    flexDirection: "column",
+    gap: 24,
+  },
+  marketingCell: {
+    flex: 1,
+    minWidth: 0,
   },
 
   // Player

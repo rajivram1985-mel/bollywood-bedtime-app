@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, Platform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Speech from "expo-speech";
 import Svg, { Rect, Path } from "react-native-svg";
@@ -14,11 +14,130 @@ import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
 const TIMER_OPTIONS = [15, 30, 45, 60];
+const IS_WEB = Platform.OS === "web";
 
 function formatTime(s) {
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);
   return `${m}:${sec.toString().padStart(2, "0")}`;
+}
+
+// ─── Web TTS engine ──────────────────────────────────────────────────────────
+//
+// `expo-speech` on web wraps `window.speechSynthesis`, but Chromium-based
+// browsers cut audio off after ~15 seconds for a single utterance. Our
+// stories are several thousand words long, so they would silently die.
+//
+// To make the player actually work in the browser, we run our own engine
+// that splits the story into short sentences and queues them one at a time.
+// We also pre-warm the voice list (some browsers populate voices async).
+//
+function createWebEngine() {
+  if (typeof window === "undefined" || !window.speechSynthesis) return null;
+
+  const synth = window.speechSynthesis;
+  let chunks = [];
+  let index = 0;
+  let onDone = () => {};
+  let onChunk = () => {};
+  let cancelled = false;
+  let voicesReady = false;
+
+  // Some browsers load voices asynchronously
+  const ensureVoices = () =>
+    new Promise((resolve) => {
+      const v = synth.getVoices();
+      if (v && v.length) { voicesReady = true; resolve(v); return; }
+      const onChange = () => {
+        const vs = synth.getVoices();
+        if (vs && vs.length) {
+          voicesReady = true;
+          synth.removeEventListener("voiceschanged", onChange);
+          resolve(vs);
+        }
+      };
+      synth.addEventListener("voiceschanged", onChange);
+      // Hard cap so we never hang
+      setTimeout(() => { resolve(synth.getVoices() || []); }, 1500);
+    });
+
+  // Prefer a soft, clear English voice
+  const pickVoice = (voices) => {
+    if (!voices || !voices.length) return null;
+    const prefs = [
+      (v) => v.lang === "en-IN",
+      (v) => v.lang?.startsWith("en-GB"),
+      (v) => v.lang?.startsWith("en-AU"),
+      (v) => v.lang?.startsWith("en"),
+    ];
+    for (const pref of prefs) {
+      const match = voices.find(pref);
+      if (match) return match;
+    }
+    return voices[0];
+  };
+
+  const splitIntoChunks = (text) => {
+    // Split on sentence boundaries; keep chunks small enough that Chrome
+    // doesn't truncate them mid-utterance.
+    const sentences = text
+      .replace(/\s+/g, " ")
+      .split(/(?<=[.!?])\s+/)
+      .filter(Boolean);
+    const out = [];
+    let buf = "";
+    for (const s of sentences) {
+      if ((buf + " " + s).trim().length > 180) {
+        if (buf) out.push(buf.trim());
+        buf = s;
+      } else {
+        buf = (buf + " " + s).trim();
+      }
+    }
+    if (buf) out.push(buf.trim());
+    return out;
+  };
+
+  const speakNext = (voice) => {
+    if (cancelled) return;
+    if (index >= chunks.length) { onDone(); return; }
+    const u = new SpeechSynthesisUtterance(chunks[index]);
+    if (voice) u.voice = voice;
+    u.rate = 0.85;     // a touch faster than expo's 0.78 for less robotic feel
+    u.pitch = 0.95;
+    u.lang = voice?.lang || "en-US";
+    u.onend = () => {
+      index++;
+      onChunk(index, chunks.length);
+      if (!cancelled) speakNext(voice);
+    };
+    u.onerror = () => {
+      // Skip past failed chunks rather than stalling
+      index++;
+      if (!cancelled) speakNext(voice);
+    };
+    synth.speak(u);
+  };
+
+  return {
+    isAvailable: true,
+    voicesReady,
+    async start({ text, onChunkProgress, onComplete }) {
+      cancelled = false;
+      synth.cancel();
+      chunks = splitIntoChunks(text);
+      index = 0;
+      onDone = onComplete || (() => {});
+      onChunk = onChunkProgress || (() => {});
+      const voices = await ensureVoices();
+      const voice = pickVoice(voices);
+      speakNext(voice);
+    },
+    stop() {
+      cancelled = true;
+      try { synth.cancel(); } catch {}
+    },
+  };
 }
 
 // ─── Animated wave bars ─────────────────────────────────────────────────────
@@ -60,15 +179,22 @@ function WaveVisualiser({ isPlaying }) {
 export default function SpeechPlayer({ text }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [elapsed, setElapsed]     = useState(0);
+  const [errorMsg, setErrorMsg]   = useState(null);
 
   // Sleep timer
   const [timerMins, setTimerMins]   = useState(null);
   const [timeLeft, setTimeLeft]     = useState(0);
   const [isFading, setIsFading]     = useState(false);
 
-  const elapsedRef      = useRef(null);
+  const elapsedRef       = useRef(null);
   const timerIntervalRef = useRef(null);
   const fadeIntervalRef  = useRef(null);
+  const webEngineRef     = useRef(null);
+
+  // Lazily build the web engine once
+  if (IS_WEB && !webEngineRef.current) {
+    webEngineRef.current = createWebEngine();
+  }
 
   // Elapsed counter
   useEffect(() => {
@@ -83,44 +209,83 @@ export default function SpeechPlayer({ text }) {
   // Cleanup on unmount / text change
   useEffect(() => {
     return () => {
-      Speech.stop();
+      stopAll();
       clearInterval(elapsedRef.current);
       clearInterval(timerIntervalRef.current);
       clearInterval(fadeIntervalRef.current);
     };
   }, [text]);
 
-  const startSpeaking = () => {
+  const stopAll = () => {
+    if (IS_WEB) {
+      webEngineRef.current?.stop();
+    } else {
+      try { Speech.stop(); } catch {}
+    }
+  };
+
+  const startSpeaking = async () => {
+    setErrorMsg(null);
+
+    if (IS_WEB) {
+      const engine = webEngineRef.current;
+      if (!engine) {
+        setErrorMsg("Sorry — your browser doesn't support speech playback. Try Chrome, Edge or Safari.");
+        return;
+      }
+      setIsPlaying(true);
+      try {
+        await engine.start({
+          text,
+          onComplete: () => { setIsPlaying(false); setElapsed(0); },
+        });
+      } catch (e) {
+        setIsPlaying(false);
+        setErrorMsg("Couldn't start the storyteller. Try tapping play again.");
+      }
+      return;
+    }
+
+    // Native (iOS / Android) — use expo-speech directly
     Speech.speak(text, {
-      // Slower pace + slightly lower pitch = warm, cosy storytelling feel
-      rate:     0.78,
-      pitch:    0.90,
-      language: "en-US",
+      rate:      0.78,
+      pitch:     0.90,
+      language:  "en-US",
       onStart:   () => setIsPlaying(true),
       onDone:    () => { setIsPlaying(false); setElapsed(0); },
       onStopped: () => setIsPlaying(false),
-      onError:   () => setIsPlaying(false),
+      onError:   () => {
+        setIsPlaying(false);
+        setErrorMsg("Couldn't play audio on this device.");
+      },
     });
   };
 
   const togglePlay = async () => {
     try {
-      const speaking = await Speech.isSpeakingAsync();
-      if (speaking) {
-        Speech.stop();
+      if (isPlaying) {
+        stopAll();
         setIsPlaying(false);
-      } else {
-        setElapsed(0);
-        startSpeaking();
+        return;
       }
+      // On native, also check the engine state in case a previous play is queued
+      if (!IS_WEB) {
+        const speaking = await Speech.isSpeakingAsync().catch(() => false);
+        if (speaking) {
+          Speech.stop();
+          setIsPlaying(false);
+          return;
+        }
+      }
+      setElapsed(0);
+      startSpeaking();
     } catch {
-      // isSpeakingAsync can fail on some platforms; just speak
       setElapsed(0);
       startSpeaking();
     }
   };
 
-  // Sleep timer — stop speech after a short fade pause
+  // Sleep timer — fade out after countdown
   const startFadeOut = () => {
     setIsFading(true);
     let steps = 0;
@@ -128,7 +293,7 @@ export default function SpeechPlayer({ text }) {
       steps++;
       if (steps >= 10) {
         clearInterval(fadeIntervalRef.current);
-        Speech.stop();
+        stopAll();
         setIsPlaying(false);
         setIsFading(false);
         setTimerMins(null);
@@ -209,6 +374,10 @@ export default function SpeechPlayer({ text }) {
           <WaveVisualiser isPlaying={isPlaying} />
         </View>
       </View>
+
+      {errorMsg ? (
+        <Text style={styles.errorText}>⚠️  {errorMsg}</Text>
+      ) : null}
 
       {/* Sleep timer */}
       <View style={styles.timerSection}>
@@ -299,6 +468,14 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: colors.gold,
     opacity: 0.7,
+  },
+
+  // Error
+  errorText: {
+    fontFamily: fonts.body,
+    fontSize: 13,
+    color: "#ff9999",
+    lineHeight: 18,
   },
 
   // Sleep timer
