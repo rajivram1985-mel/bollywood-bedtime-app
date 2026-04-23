@@ -14,12 +14,11 @@ There is no test runner, linter, or build step configured beyond Expo's own bund
 
 ## Environment variables
 
-Two scopes (see [.env.example](.env.example)):
+Three scopes (see [.env.example](.env.example)):
 
 - **Build-time scripts** (Node, not bundled): `ANTHROPIC_API_KEY`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`.
-- **Runtime client** (`EXPO_PUBLIC_*` are inlined into the app bundle): `EXPO_PUBLIC_ANTHROPIC_API_KEY` (used for on-demand story generation from the UI), `EXPO_PUBLIC_TMDB_API_KEY` (poster lookups).
-
-The runtime Anthropic call sets `anthropic-dangerous-direct-browser-access: true` because Expo web runs in a browser context.
+- **Runtime client** (`EXPO_PUBLIC_*` are inlined into the app bundle and visible to anyone): `EXPO_PUBLIC_TMDB_API_KEY` only.
+- **Netlify Function** (server-side, set in Netlify dashboard): `ANTHROPIC_API_KEY` — read by [netlify/functions/generate-story.mjs](netlify/functions/generate-story.mjs). Never expose this client-side.
 
 ## Architecture
 
@@ -42,7 +41,11 @@ iOS background audio is enabled via `UIBackgroundModes: ["audio"]` in [app.json]
 
 ### Story prompt is duplicated in three files
 
-The `AGE_CONFIG` object and prompt template appear in [src/utils/api.js](src/utils/api.js), [scripts/generate-prebuilt.js](scripts/generate-prebuilt.js), and [scripts/generate-text-only.js](scripts/generate-text-only.js). Changing the prompt requires updating all three; otherwise runtime-generated and prebuilt stories drift in tone. Model used everywhere: `claude-sonnet-4-6`.
+The `AGE_CONFIG` object and prompt template appear in [netlify/functions/generate-story.mjs](netlify/functions/generate-story.mjs), [scripts/generate-prebuilt.js](scripts/generate-prebuilt.js), and [scripts/generate-text-only.js](scripts/generate-text-only.js). Changing the prompt requires updating all three; otherwise runtime-generated and prebuilt stories drift in tone. Model used everywhere: `claude-sonnet-4-6`.
+
+### Story generation is server-side
+
+Runtime story generation goes through a Netlify Function ([netlify/functions/generate-story.mjs](netlify/functions/generate-story.mjs)) — the client posts `{ movieName, ageRange }` to `/.netlify/functions/generate-story` and receives `{ text }`. This keeps `ANTHROPIC_API_KEY` off the client. For local dev install `netlify-cli` and run `netlify dev` (port 8888) instead of `npm run web` — it spawns Metro and proxies the function on one origin. Plain `npm run web` will 404 on the function call.
 
 ### Movie posters
 
@@ -58,4 +61,4 @@ The `AGE_CONFIG` object and prompt template appear in [src/utils/api.js](src/uti
 
 ### Vestigial code
 
-[src/config.js](src/config.js) exports `API_BASE_URL` pointing to a local `:3001` server, but nothing imports it — there is no backend in this repo. All external calls go directly from the client to Anthropic / ElevenLabs / TMDB.
+[src/config.js](src/config.js) exports `API_BASE_URL` pointing to a local `:3001` server, but nothing imports it. The Netlify Function uses a relative path (`/.netlify/functions/...`), and TMDB is called directly from the client. Safe to delete.

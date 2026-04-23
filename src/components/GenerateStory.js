@@ -82,7 +82,7 @@ export default function GenerateStory({ onGenerated }) {
     setLoading(true);
     setError(null);
     try {
-      const text = await generateStory(null, name, ageRange);
+      const text = await generateStory(name, ageRange);
       const posterUrl = await fetchMoviePoster(name);
       onGenerated({ movieName: name, text, audio: null, posterUrl: posterUrl ?? null });
       setMovieName("");
