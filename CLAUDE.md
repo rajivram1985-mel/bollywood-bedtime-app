@@ -6,11 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `npm start` — start Expo dev server (then press `w` for web, `a` for Android, `i` for iOS, or scan QR with Expo Go).
 - `npm run web` / `npm run android` / `npm run ios` — start with a target platform pre-selected.
-- `node scripts/generate-prebuilt.js` — (re)generate text + ElevenLabs MP3 audio for the prebuilt movie list. Skips movies already present in [assets/audio/stories-cache.json](assets/audio/stories-cache.json).
-- `node scripts/generate-text-only.js` — generate text-only stories (no audio); appended to `prebuiltStories.js` with `audio: null` so they fall back to `expo-speech`.
-- `node scripts/patch-cache.js` — backfill `stories-cache.json` from existing entries in `prebuiltStories.js` (used after manual edits to avoid regenerating audio).
+- `node scripts/generate-stories.js [--ages=3-5,9-12] [--films=ddlj,sholay] [--audio] [--dry-run]` — write any missing bundled story text with Claude (and, with `--audio`, ElevenLabs narration). Idempotent: skips film×age pairs that already exist. `--dry-run` prints what would run plus the ElevenLabs character count (that's the paid part).
+- `node scripts/optimize-audio.js` — re-encode raw ElevenLabs `.mp3` in `assets/audio/` to 56 kbps mono AAC `.m4a` (~55% smaller), delete the mp3, regenerate the audio manifest. Run after any `--audio` generation.
+- `node scripts/build-images.js` — convert any `assets/illustrations/*.png` to JPEG and re-render the app icon / adaptive icon / splash / favicon from the vector brand mark defined in the script (source SVG also written to `assets/brand/icon.svg`).
 
-There is no test runner, linter, or build step configured beyond Expo's own bundler.
+There is no test runner or linter. `npx expo export --platform web` is the closest thing to a build check (it's what Netlify runs).
 
 ## Environment variables
 
@@ -22,43 +22,46 @@ Three scopes (see [.env.example](.env.example)):
 
 ## Architecture
 
-**Single-screen Expo app, universal (iOS/Android/web), no navigation library.** [App.js](App.js) reads `ONBOARDING_DONE` from AsyncStorage and conditionally renders `OnboardingScreen` or `HomeScreen`. Long-pressing the moon emoji on the home header re-triggers onboarding.
+**Expo app, universal (iOS/Android/web), no navigation library.** [App.js](App.js) wraps everything in `SafeAreaProvider` + `ProfileProvider`, and renders `OnboardingScreen` until at least one child profile exists, then `HomeScreen`. The player (`NowPlayingScreen`) and `SettingsSheet` are `Modal`s owned by `HomeScreen`.
 
-### Two narration paths
+### Content model: film × age
 
-A story is either pre-bundled with audio or narrated on-device — the home screen picks the player based on whether `audioUri` is set:
+Every bundled film has up to three versions — ages `3-5` (~1000 words, ~7 min), `6-8` (~1800, ~12 min), `9-12` (~2500, ~17 min).
 
-- **`AudioPlayer`** ([src/components/AudioPlayer.js](src/components/AudioPlayer.js)) — plays bundled MP3s via `expo-av`. Includes a sleep timer that fades volume over 5 s before stopping. Used only for the original 5 prebuilt stories.
-- **`SpeechPlayer`** ([src/components/SpeechPlayer.js](src/components/SpeechPlayer.js)) — uses on-device `expo-speech` TTS. Used for everything else (newer text-only prebuilts and user-generated stories), so they ship without audio assets. Its sleep timer just stops speech (no fade — TTS has no volume API).
+- [src/data/films.js](src/data/films.js) — **hand-maintained**: id, title, year, collection, tagline, illustration. `COLLECTIONS` drives the home-screen rows.
+- [src/data/storyTexts.json](src/data/storyTexts.json) — **generated**: `{ [filmId]: { [age]: text } }`.
+- [src/data/storyAudio.js](src/data/storyAudio.js) — **generated** by [scripts/lib/audio-manifest.js](scripts/lib/audio-manifest.js) from files named `assets/audio/<filmId>-<age>.m4a`. Metro can only bundle literal `require()`s, hence the generated file.
+- [src/data/catalog.js](src/data/catalog.js) joins the three into story objects. `getFilmStory(film, age)` falls back to the nearest available age (preferring younger) if a version is missing. A story has `audio` (narrated) or not (device TTS).
 
-iOS background audio is enabled via `UIBackgroundModes: ["audio"]` in [app.json](app.json) plus `Audio.setAudioModeAsync({ staysActiveInBackground: true, ... })` in [App.js](App.js).
+To add a film: add it to `FILMS` in both `src/data/films.js` and `scripts/generate-stories.js`, add an illustration, then run the generator.
 
-### Prebuilt stories pipeline
+### Story prompt — single source
 
-[src/constants/prebuiltStories.js](src/constants/prebuiltStories.js) is **auto-generated** — do not edit manually. The `PREBUILT_STORIES` array contains `{ movieName, ageRange, text, audio }` entries; `audio` is either a `require("../../assets/audio/<file>.mp3")` (plays via `AudioPlayer`) or `null` (plays via `SpeechPlayer`).
+[shared/story-prompt.cjs](shared/story-prompt.cjs) holds `AGE_CONFIG` and `buildStoryPrompt`. Used by the generator script and imported by the Netlify Function (which prepends its `NOT_A_FILM` validation). Model everywhere: `claude-sonnet-4-6`.
 
-[assets/audio/stories-cache.json](assets/audio/stories-cache.json) is the script's idempotency mechanism — if a movie is in the cache AND its `.mp3` exists, `generate-prebuilt.js` skips it. Delete cache entries to force regeneration.
+### Profiles and preferences
 
-### Story prompt is duplicated in three files
+[src/state/ProfileContext.js](src/state/ProfileContext.js) — local-only family state: `kids [{id, name, ageRange}]`, active kid, prefs (`storiesPerNight`), and play history (feeds the "tonight's pick" rotation so the hero doesn't repeat recently heard stories). It migrates pre-profile installs (legacy `age-range` key → one unnamed child).
 
-The `AGE_CONFIG` object and prompt template appear in [netlify/functions/generate-story.mjs](netlify/functions/generate-story.mjs), [scripts/generate-prebuilt.js](scripts/generate-prebuilt.js), and [scripts/generate-text-only.js](scripts/generate-text-only.js). Changing the prompt requires updating all three; otherwise runtime-generated and prebuilt stories drift in tone. Model used everywhere: `claude-sonnet-4-6`.
+### Playback
 
-### Story generation is server-side
+[src/player/usePlayback.js](src/player/usePlayback.js) drives one story through one of two engines with the same interface (`load/play/pause/seekTo/unload`, status callbacks):
 
-Runtime story generation goes through a Netlify Function ([netlify/functions/generate-story.mjs](netlify/functions/generate-story.mjs)) — the client posts `{ movieName, ageRange }` to `/.netlify/functions/generate-story` and receives `{ text }`. This keeps `ANTHROPIC_API_KEY` off the client. For local dev install `netlify-cli` and run `netlify dev` (port 8888) instead of `npm run web` — it spawns Metro and proxies the function on one origin. Plain `npm run web` will 404 on the function call.
+- [audioEngine.js](src/player/audioEngine.js) — bundled `.m4a` via `expo-av`. `expo-av` is removed in SDK 55; migrating to `expo-audio` should only touch this file.
+- [speechEngine.js](src/player/speechEngine.js) — device TTS via `expo-speech` / `window.speechSynthesis`. Text is spoken in ~220-char sentence chunks because Android TTS rejects input over 4000 chars and Chromium cuts long utterances off. Position/duration are estimated from characters; seeking snaps to chunk boundaries but always moves at least one chunk. Prefers en-IN voices.
 
-### Movie posters
+[NowPlayingScreen](src/screens/NowPlayingScreen.js) owns the bedtime session: a queue (tapped story first, then the rest of the catalogue), "stories tonight" count (1–3) instead of a minutes timer, auto-advance, a goodnight screen when done, read-along text, and dim mode (manual, plus automatic after 45 s idle while playing).
 
-[src/utils/tmdb.js](src/utils/tmdb.js) fetches posters from TMDB and caches the URL map in AsyncStorage under `tmdb-poster-cache-v1`. `MOVIE_METADATA` (search title + year + fallback emoji) lives in [src/components/FeaturedStories.js](src/components/FeaturedStories.js); `GENRE_SECTIONS` in the same file controls the tab structure ("Timeless Classics", "Heart & Drama", etc.). User-generated stories appear under a dynamic "My Stories" tab.
+iOS background audio is enabled via `UIBackgroundModes: ["audio"]` in [app.json](app.json) plus `Audio.setAudioModeAsync({ staysActiveInBackground: true, ... })` in [App.js](App.js). Background behaviour of the chunked TTS path has not been verified on a device.
 
-### Storage abstraction
+### Story generation is server-side (web only for now)
 
-[src/utils/storage.js](src/utils/storage.js) wraps two backends behind one `STORAGE_KEYS` registry: `expo-secure-store` (API keys, 2 KB value limit) and `AsyncStorage` (everything else — saved stories, age range, onboarding flag). Use the helpers, not the underlying APIs directly, so the SecureStore-vs-AsyncStorage decision stays in one place.
+The client posts `{ movieName, ageRange }` to `/.netlify/functions/generate-story` and reads Anthropic's SSE stream. This only works on web: native has no origin for the relative URL and React Native's `fetch` has no streaming body. For local dev run `netlify dev` (port 8888); plain `npm run web` 404s on the function. Generated stories are saved under "Made by you" and always use device TTS.
 
-### Layout
+### Storage
 
-[HomeScreen.js](src/screens/HomeScreen.js) switches between a 3-column layout (`WhySection` sidebars + center column) and a single-column layout at a 900 px width breakpoint via `useWindowDimensions`.
+[src/utils/storage.js](src/utils/storage.js) — AsyncStorage helpers (`getData/setData/getJSON/setJSON`) and the `STORAGE_KEYS` registry. Everything is device-local.
 
-### Vestigial code
+### Web gotcha: images
 
-[src/config.js](src/config.js) exports `API_BASE_URL` pointing to a local `:3001` server, but nothing imports it. The Netlify Function uses a relative path (`/.netlify/functions/...`), and TMDB is called directly from the client. Safe to delete.
+React Native Web sizes a `require()`d image to its intrinsic pixels unless the style sets width/height explicitly — `absoluteFill` alone isn't enough. Use [StoryArt](src/components/StoryArt.js), which sets `width/height: "100%"`.

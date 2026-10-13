@@ -27,11 +27,12 @@ export const colors = {
   borderGoldFaint: "rgba(255, 200, 100, 0.06)",
   borderGoldMedium: "rgba(255, 200, 100, 0.2)",
 
-  // Text
+  // Text — tertiary stays ≥ 4.5:1 on the darkest background (WCAG AA)
   white: "#FFFFFF",
-  textPrimary: "rgba(255, 255, 255, 0.7)",
-  textSecondary: "rgba(255, 255, 255, 0.4)",
-  textTertiary: "rgba(255, 255, 255, 0.35)",
+  textPrimary: "rgba(255, 255, 255, 0.88)",
+  textSecondary: "rgba(255, 255, 255, 0.72)",
+  textTertiary: "rgba(255, 255, 255, 0.6)",
+  onGold: "#1a0a00",
   textMuted: "rgba(255, 255, 255, 0.18)",
   textSubtle: "rgba(255, 255, 255, 0.3)",
 

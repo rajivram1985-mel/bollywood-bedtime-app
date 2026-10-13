@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { View, Text, Pressable, StyleSheet, SafeAreaView, ScrollView } from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import Svg, { Defs, RadialGradient, Stop, Circle } from "react-native-svg";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   FadeIn,
   FadeInUp,
@@ -13,7 +15,7 @@ import Animated, {
 } from "react-native-reanimated";
 import NightSky from "../components/NightSky";
 import { AGE_RANGES } from "../constants/ageRanges";
-import { STORAGE_KEYS, setData } from "../utils/storage";
+import { useProfiles } from "../state/ProfileContext";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
@@ -48,7 +50,18 @@ function MoonCluster() {
 
   return (
     <View style={styles.moonCluster}>
-      <Animated.View style={[styles.moonHalo, glowStyle]} pointerEvents="none" />
+      {/* Soft radial glow — a plain View with shadow renders as a hard disc on web/Android */}
+      <Animated.View style={[styles.moonHalo, glowStyle]} pointerEvents="none">
+        <Svg width="100%" height="100%" viewBox="0 0 100 100">
+          <Defs>
+            <RadialGradient id="halo" cx="50" cy="50" r="50" gradientUnits="userSpaceOnUse">
+              <Stop offset="0" stopColor={colors.gold} stopOpacity="0.45" />
+              <Stop offset="1" stopColor={colors.gold} stopOpacity="0" />
+            </RadialGradient>
+          </Defs>
+          <Circle cx="50" cy="50" r="50" fill="url(#halo)" />
+        </Svg>
+      </Animated.View>
       <Animated.Text style={[styles.moon, floatStyle]}>🌙</Animated.Text>
       <Sparkle top={2} left={"22%"} delay={0} />
       <Sparkle top={20} left={"78%"} delay={600} small />
@@ -83,17 +96,17 @@ function Sparkle({ top, left, delay = 0, small = false }) {
   );
 }
 
-// ─── Single-screen onboarding: just the age picker ───────────────────────────
-export default function OnboardingScreen({ onComplete }) {
+// ─── Single-screen onboarding: who's listening (name + age) ──────────────────
+export default function OnboardingScreen() {
+  const insets = useSafeAreaInsets();
+  const { addKid } = useProfiles();
+  const [name, setName] = useState("");
   const [selectedAge, setSelectedAge] = useState(null);
 
-  const handleComplete = async () => {
+  // Adding the first child is what completes onboarding (App switches to Home).
+  const handleComplete = () => {
     if (!selectedAge) return;
-    await Promise.all([
-      setData(STORAGE_KEYS.AGE_RANGE, selectedAge),
-      setData(STORAGE_KEYS.ONBOARDING_DONE, "1"),
-    ]);
-    onComplete();
+    addKid({ name, ageRange: selectedAge });
   };
 
   const canFinish = !!selectedAge;
@@ -105,10 +118,11 @@ export default function OnboardingScreen({ onComplete }) {
       style={styles.root}
     >
       <NightSky />
-      <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView style={styles.safeArea} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 48 }]}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
           {/* Compact brand header */}
           <Animated.View entering={FadeIn.duration(500)} style={styles.brandHeader}>
@@ -129,14 +143,29 @@ export default function OnboardingScreen({ onComplete }) {
               entering={FadeInUp.duration(500).delay(120)}
               style={styles.headline}
             >
-              How old is your{"\n"}little one?
+              Who's listening{"\n"}tonight?
             </Animated.Text>
             <Animated.Text
               entering={FadeInUp.duration(500).delay(240)}
               style={styles.body}
             >
-              We tailor vocabulary and story length to match their age.
+              Every story is written for their age — simpler words for little ones, richer tales for big kids.
             </Animated.Text>
+
+            <Animated.View entering={FadeInUp.duration(500).delay(300)} style={styles.nameWrap}>
+              <TextInput
+                value={name}
+                onChangeText={setName}
+                placeholder="Their name (optional)"
+                placeholderTextColor={colors.textTertiary}
+                style={styles.nameInput}
+                maxLength={24}
+                autoCapitalize="words"
+                autoCorrect={false}
+                returnKeyType="done"
+                accessibilityLabel="Child's name, optional"
+              />
+            </Animated.View>
 
             <View style={styles.ageGrid}>
               {AGE_RANGES.map((range, i) => {
@@ -150,6 +179,9 @@ export default function OnboardingScreen({ onComplete }) {
                     <Pressable
                       onPress={() => setSelectedAge(range.key)}
                       style={[styles.ageCard, active && styles.ageCardActive]}
+                      accessibilityRole="radio"
+                      accessibilityState={{ checked: active }}
+                      accessibilityLabel={`${range.label}. ${range.description}`}
                     >
                       <Text style={styles.ageEmoji}>{range.emoji}</Text>
                       <Text style={[styles.ageLabel, active && styles.ageLabelActive]}>
@@ -199,12 +231,12 @@ export default function OnboardingScreen({ onComplete }) {
                 </Text>
               </LinearGradient>
             </Pressable>
-            {!canFinish && (
-              <Text style={styles.ctaHint}>Pick an age to continue</Text>
-            )}
+            <Text style={styles.ctaHint}>
+              {canFinish ? "You can add brothers and sisters later." : "Pick an age to continue"}
+            </Text>
           </Animated.View>
         </ScrollView>
-      </SafeAreaView>
+      </KeyboardAvoidingView>
     </LinearGradient>
   );
 }
@@ -215,8 +247,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 48,
     alignItems: "center",
   },
 
@@ -246,15 +276,8 @@ const styles = StyleSheet.create({
   },
   moonHalo: {
     position: "absolute",
-    width: 170,
-    height: 170,
-    borderRadius: 85,
-    backgroundColor: colors.gold,
-    opacity: 0.18,
-    shadowColor: colors.gold,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 50,
+    width: 200,
+    height: 200,
   },
   moon: {
     fontSize: 76,
@@ -315,8 +338,25 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     color: "rgba(255,255,255,0.78)",
     textAlign: "center",
-    marginBottom: 24,
+    marginBottom: 20,
     maxWidth: 380,
+  },
+  nameWrap: {
+    width: "100%",
+    marginBottom: 16,
+  },
+  nameInput: {
+    minHeight: 52,
+    borderRadius: 14,
+    paddingHorizontal: 18,
+    backgroundColor: "rgba(255,255,255,0.06)",
+    borderWidth: 1,
+    borderColor: colors.borderGoldMedium,
+    fontFamily: fonts.bodySemiBold,
+    fontSize: 17,
+    color: colors.white,
+    textAlign: "center",
+    outlineStyle: "none",
   },
 
   // ── Age grid ──────────────────────────────────────────────────────────────

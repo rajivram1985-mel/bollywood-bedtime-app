@@ -18,7 +18,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { generateStory } from "../utils/api";
 import { fetchMoviePoster } from "../utils/tmdb";
-import { getData, STORAGE_KEYS } from "../utils/storage";
+import { ageLabel } from "../constants/ageRanges";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
@@ -63,18 +63,11 @@ function PulseDot({ delay }) {
   return <Animated.View style={[styles.dot, style]} />;
 }
 
-export default function GenerateStory({ onGenerated }) {
+export default function GenerateStory({ ageRange = "6-8", kidName, onGenerated }) {
   const [movieName, setMovieName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [ageRange, setAgeRange] = useState("6-8");
   const inputRef = useRef(null);
-
-  useEffect(() => {
-    getData(STORAGE_KEYS.AGE_RANGE).then((val) => {
-      if (val) setAgeRange(val);
-    });
-  }, []);
 
   const handleGenerate = async () => {
     const name = movieName.trim();
@@ -84,7 +77,7 @@ export default function GenerateStory({ onGenerated }) {
     try {
       const text = await generateStory(name, ageRange);
       const posterUrl = await fetchMoviePoster(name);
-      onGenerated({ movieName: name, text, audio: null, posterUrl: posterUrl ?? null });
+      onGenerated({ movieName: name, text, ageRange, posterUrl: posterUrl ?? null });
       setMovieName("");
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
@@ -103,13 +96,14 @@ export default function GenerateStory({ onGenerated }) {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.headerRow}>
-        <Text style={styles.title}>🎬 What's tonight's story?</Text>
+        <Text style={styles.title}>Make a story from any film</Text>
         <View style={styles.aiBadge}>
           <Text style={styles.aiBadgeText}>AI</Text>
         </View>
       </View>
       <Text style={styles.subtitle}>
-        Select from the list below or name any movie which we'll turn into a cosy bedtime story.
+        Name a Bollywood film you love and we'll write a gentle bedtime version
+        {kidName ? ` for ${kidName}` : ""}, ages {ageLabel(ageRange)}. It's saved under "Made by you".
       </Text>
 
       {/* Input */}
@@ -199,7 +193,8 @@ const styles = StyleSheet.create({
     borderColor: colors.borderGold,
     padding: 20,
     gap: 14,
-    marginBottom: 28,
+    marginHorizontal: 20,
+    marginTop: 36,
   },
 
   // Header
@@ -342,7 +337,7 @@ const styles = StyleSheet.create({
   generateBtnText: {
     fontFamily: fonts.heading,
     fontSize: 15,
-    color: "#1a0a00",
+    color: colors.onGold,
   },
   generateBtnTextDisabled: {
     color: "rgba(255,255,255,0.3)",

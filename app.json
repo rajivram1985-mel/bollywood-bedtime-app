@@ -21,16 +21,29 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0a0620"
+        "backgroundColor": "#1a1040"
       },
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "name": "Bollywood Bedtime",
+      "shortName": "Bedtime",
+      "description": "Gentle bedtime stories inspired by much-loved Bollywood films, written for your child's age.",
+      "favicon": "./assets/favicon.png",
+      "themeColor": "#0a0620",
+      "backgroundColor": "#0a0620"
     },
     "plugins": [
       "expo-font",
-      "expo-secure-store"
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#0a0620"
+        }
+      ]
     ]
   }
 }

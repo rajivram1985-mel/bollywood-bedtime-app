@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+         <stop offset="0" stop-color="#2A1A5E"/><stop offset="1" stop-color="#0A0620"/>
+       </linearGradient></defs>
+       <rect width="1024" height="1024" fill="url(#sky)"/>
+       <path d="M120 150 L218 176.78784026555627 L316 199.49747468305833 L414 214.67156727579007 L512 220 L610 214.67156727579007 L708 199.49747468305833 L806 176.7878402655563 L904 150" stroke="#F6A623" stroke-opacity="0.35" stroke-width="5" fill="none"/><circle cx="218" cy="198.78784026555627" r="34" fill="#E8783A" opacity="0.18"/><circle cx="218" cy="198.78784026555627" r="15" fill="#E8783A"/><circle cx="316" cy="221.49747468305833" r="34" fill="#FCD89D" opacity="0.18"/><circle cx="316" cy="221.49747468305833" r="15" fill="#FCD89D"/><circle cx="414" cy="236.67156727579007" r="34" fill="#E8783A" opacity="0.18"/><circle cx="414" cy="236.67156727579007" r="15" fill="#E8783A"/><circle cx="512" cy="242" r="34" fill="#FCD89D" opacity="0.18"/><circle cx="512" cy="242" r="15" fill="#FCD89D"/><circle cx="610" cy="236.67156727579007" r="34" fill="#E8783A" opacity="0.18"/><circle cx="610" cy="236.67156727579007" r="15" fill="#E8783A"/><circle cx="708" cy="221.49747468305833" r="34" fill="#FCD89D" opacity="0.18"/><circle cx="708" cy="221.49747468305833" r="15" fill="#FCD89D"/><circle cx="806" cy="198.7878402655563" r="34" fill="#E8783A" opacity="0.18"/><circle cx="806" cy="198.7878402655563" r="15" fill="#E8783A"/>
+    <g transform="translate(0 0) scale(1)">
+    
+    <defs>
+      <linearGradient id="moonFill" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#FFE7B8"/>
+        <stop offset="0.55" stop-color="#FCD89D"/>
+        <stop offset="1" stop-color="#F6A623"/>
+      </linearGradient>
+      <radialGradient id="moonGlow">
+        <stop offset="0" stop-color="#F6A623" stop-opacity="0.45"/>
+        <stop offset="1" stop-color="#F6A623" stop-opacity="0"/>
+      </radialGradient>
+      <mask id="crescent">
+        <rect width="1024" height="1024" fill="white"/>
+        <circle cx="613.4" cy="499" r="232.2" fill="black"/>
+      </mask>
+    </defs>
+    <circle cx="500" cy="580" r="472.5" fill="url(#moonGlow)"/>
+    <circle cx="500" cy="580" r="270" fill="url(#moonFill)" mask="url(#crescent)"/>
+    <path d="M770 384 Q782.88 417.12 816 430 Q782.88 442.88 770 476 Q757.12 442.88 724 430 Q757.12 417.12 770 384Z" fill="#FCD89D" opacity="1"/>
+    <path d="M250 350 Q258.4 371.6 280 380 Q258.4 388.4 250 410 Q241.6 388.4 220 380 Q241.6 371.6 250 350Z" fill="#FCD89D" opacity="0.85"/>
+    <path d="M800 766 Q806.72 783.28 824 790 Q806.72 796.72 800 814 Q793.28 796.72 776 790 Q793.28 783.28 800 766Z" fill="#FCD89D" opacity="0.7"/></g>
+  </svg>

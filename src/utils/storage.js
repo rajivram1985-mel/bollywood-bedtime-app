@@ -1,38 +1,16 @@
-import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// SecureStore has a 2048-byte value limit, so we use it only for API keys.
-// Everything else (stories, voice selection) goes in AsyncStorage.
-
 export const STORAGE_KEYS = {
-  API_KEY: "elevenlabs-api-key",
-  ANTHROPIC_KEY: "anthropic-api-key",
-  VOICE_ID: "selected-voice-id",
-  SAVED_STORIES: "saved-stories",
+  // Current
+  KIDS: "kids-v1",
+  ACTIVE_KID: "active-kid-v1",
+  PREFS: "prefs-v1",
+  PLAY_HISTORY: "play-history-v1",
   GENERATED_STORIES: "generated-stories",
+  // Legacy (read once for migration)
   AGE_RANGE: "age-range",
   ONBOARDING_DONE: "onboarding-done",
 };
-
-// --- Secure storage (API keys) ---
-
-export async function getSecure(key) {
-  try {
-    return await SecureStore.getItemAsync(key);
-  } catch {
-    return null;
-  }
-}
-
-export async function setSecure(key, value) {
-  try {
-    await SecureStore.setItemAsync(key, value);
-  } catch {
-    // silently fail
-  }
-}
-
-// --- Async storage (general data) ---
 
 export async function getData(key) {
   try {
@@ -48,4 +26,18 @@ export async function setData(key, value) {
   } catch {
     // silently fail
   }
+}
+
+export async function getJSON(key, fallback) {
+  const raw = await getData(key);
+  if (!raw) return fallback;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+
+export function setJSON(key, value) {
+  return setData(key, JSON.stringify(value));
 }

@@ -1,133 +1,79 @@
-import { useState, useCallback, useEffect } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, SafeAreaView, useWindowDimensions } from "react-native";
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import NightSky from "../components/NightSky";
-import AudioPlayer from "../components/AudioPlayer";
-import SpeechPlayer from "../components/SpeechPlayer";
+import TonightHero from "../components/TonightHero";
+import StoryRow from "../components/StoryRow";
 import GenerateStory from "../components/GenerateStory";
-import FeaturedStories from "../components/FeaturedStories";
-import WhySection from "../components/WhySection";
+import KidAvatar from "../components/KidAvatar";
+import { GearIcon } from "../components/Icons";
+import NowPlayingScreen from "./NowPlayingScreen";
+import SettingsSheet from "./SettingsSheet";
 
-import { getData, setData, STORAGE_KEYS } from "../utils/storage";
+import { useProfiles } from "../state/ProfileContext";
+import { COLLECTIONS, getBundledStories, toGeneratedStory, pickTonight, buildQueue } from "../data/catalog";
+import { getJSON, setJSON, STORAGE_KEYS } from "../utils/storage";
+import { ageLabel } from "../constants/ageRanges";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
-const WIDE_BREAKPOINT = 900;
+function greetingFor(name) {
+  const evening = new Date().getHours() >= 17 || new Date().getHours() < 4;
+  const hello = evening ? "Shubh ratri" : "Namaste";
+  return name ? `${hello}, ${name}` : hello;
+}
 
-export default function HomeScreen({ onResetOnboarding }) {
-  const { width } = useWindowDimensions();
-  const isWide = width >= WIDE_BREAKPOINT;
+export default function HomeScreen() {
+  const insets = useSafeAreaInsets();
+  const { kids, activeKid, setActiveKid, recentIds } = useProfiles();
+  const ageRange = activeKid?.ageRange ?? "6-8";
 
-  const [currentStory, setCurrentStory] = useState(null);
-  const [audioUri, setAudioUri] = useState(null);
-  const [showStoryText, setShowStoryText] = useState(false);
-  const [generatedStories, setGeneratedStories] = useState([]);
+  const [savedGenerated, setSavedGenerated] = useState([]);
+  const [queue, setQueue] = useState(null); // non-null = player open
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
-    getData(STORAGE_KEYS.GENERATED_STORIES).then((val) => {
-      if (val) setGeneratedStories(JSON.parse(val));
-    });
+    getJSON(STORAGE_KEYS.GENERATED_STORIES, []).then(setSavedGenerated);
   }, []);
 
-  const loadPrebuiltStory = useCallback((story) => {
-    setCurrentStory({ movieName: story.movieName, text: story.text });
-    setAudioUri(story.audio);
-    setShowStoryText(false);
-  }, []);
-
-  const loadGeneratedStory = useCallback((story) => {
-    setCurrentStory({ movieName: story.movieName, text: story.text });
-    setAudioUri(null);
-    setShowStoryText(false);
-  }, []);
-
-  const handleGenerated = useCallback((story) => {
-    loadGeneratedStory(story);
-    setGeneratedStories((prev) => {
-      const filtered = prev.filter((s) => s.movieName !== story.movieName);
-      const updated = [{ ...story, savedAt: new Date().toISOString() }, ...filtered];
-      setData(STORAGE_KEYS.GENERATED_STORIES, JSON.stringify(updated));
-      return updated;
-    });
-  }, [loadGeneratedStory]);
-
-  const deleteGeneratedStory = useCallback((movieName) => {
-    setGeneratedStories((prev) => {
-      const updated = prev.filter((s) => s.movieName !== movieName);
-      setData(STORAGE_KEYS.GENERATED_STORIES, JSON.stringify(updated));
-      return updated;
-    });
-  }, []);
-
-  const closePlayer = useCallback(() => {
-    setCurrentStory(null);
-    setAudioUri(null);
-    setShowStoryText(false);
-  }, []);
-
-  const playerSection = currentStory && (
-    <Animated.View entering={FadeIn.duration(500)} style={styles.playerSection}>
-      <View style={styles.playerHeader}>
-        <Text style={styles.nowPlaying}>
-          {"\ud83c\udfac"} {currentStory.movieName}
-        </Text>
-        <Pressable onPress={closePlayer} style={styles.closeBtn} hitSlop={10}>
-          <Text style={styles.closeBtnText}>✕</Text>
-        </Pressable>
-      </View>
-      {audioUri ? (
-        <AudioPlayer audioUri={audioUri} />
-      ) : (
-        <SpeechPlayer text={currentStory.text} />
-      )}
-      <Pressable
-        onPress={() => setShowStoryText(!showStoryText)}
-        style={styles.storyToggle}
-      >
-        <Text style={styles.storyToggleText}>
-          {showStoryText ? "\u25bc" : "\u25b6"}{" "}
-          {"\ud83d\udcd6"} Read the story text
-        </Text>
-      </Pressable>
-      {showStoryText && (
-        <ScrollView style={styles.storyTextScroll} nestedScrollEnabled>
-          <Text style={styles.storyText}>{currentStory.text}</Text>
-        </ScrollView>
-      )}
-    </Animated.View>
+  const bundled = useMemo(() => getBundledStories(ageRange), [ageRange]);
+  const generated = useMemo(() => savedGenerated.map(toGeneratedStory), [savedGenerated]);
+  const tonight = useMemo(
+    () => pickTonight(bundled, { seed: activeKid?.id ?? "", recentIds }),
+    // Recompute only when the child or age changes, not after every play.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [bundled, activeKid?.id]
   );
 
-  // Main column — film grid is the hero, generate-your-own is secondary
-  const mainColumn = (
-    <>
-      {playerSection}
-      <FeaturedStories
-        onSelect={loadPrebuiltStory}
-        generatedStories={generatedStories}
-        onDeleteGenerated={deleteGeneratedStory}
-      />
-      <View style={styles.spacer} />
-      <GenerateStory onGenerated={handleGenerated} />
-    </>
+  const playBundled = useCallback((story) => setQueue(buildQueue(bundled, story.id)), [bundled]);
+  const playGenerated = useCallback(
+    (story) => setQueue([story, ...buildQueue(bundled, tonight?.id)]),
+    [bundled, tonight]
   );
 
-  // Marketing/why content moved out of sidebars and into a single
-  // full-width footer section so the film grid takes centre stage.
-  const marketingFooter = (
-    <View style={isWide ? styles.marketingFooterWide : styles.marketingFooterNarrow}>
-      <View style={styles.marketingDivider} />
-      <View style={isWide ? styles.marketingRow : styles.marketingCol}>
-        <View style={styles.marketingCell}>
-          <WhySection section="sleep" compact />
-        </View>
-        <View style={styles.marketingCell}>
-          <WhySection section="bollywood" compact />
-        </View>
-      </View>
-    </View>
+  const handleGenerated = useCallback(
+    (saved) => {
+      const entry = { ...saved, savedAt: new Date().toISOString() };
+      setSavedGenerated((prev) => {
+        const next = [entry, ...prev.filter((s) => s.movieName !== saved.movieName)];
+        setJSON(STORAGE_KEYS.GENERATED_STORIES, next);
+        return next;
+      });
+      playGenerated(toGeneratedStory(entry));
+    },
+    [playGenerated]
   );
+
+  const deleteGenerated = useCallback((story) => {
+    setSavedGenerated((prev) => {
+      const next = prev.filter((s) => s.movieName !== story.movieName);
+      setJSON(STORAGE_KEYS.GENERATED_STORIES, next);
+      return next;
+    });
+  }, []);
 
   return (
     <LinearGradient
@@ -136,185 +82,142 @@ export default function HomeScreen({ onResetOnboarding }) {
       style={styles.root}
     >
       <NightSky />
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
+      <ScrollView
+        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 48 }]}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.column}>
           {/* Header */}
           <Animated.View entering={FadeInDown.duration(400)} style={styles.header}>
-            <Pressable onLongPress={onResetOnboarding} delayLongPress={800}>
-              <Text style={styles.moonEmoji}>{"\ud83c\udf19"}</Text>
+            <View style={styles.headerText}>
+              <Text style={styles.greeting} numberOfLines={1}>
+                {greetingFor(activeKid?.name)} <Text style={styles.moon}>🌙</Text>
+              </Text>
+              <Text style={styles.subhead}>Bedtime stories for ages {ageLabel(ageRange)}</Text>
+            </View>
+            <Pressable
+              onPress={() => setSettingsOpen(true)}
+              style={styles.gearBtn}
+              hitSlop={6}
+              accessibilityRole="button"
+              accessibilityLabel="Family and settings"
+            >
+              <GearIcon color={colors.textPrimary} />
             </Pressable>
-            <Text style={styles.titleMask}>Bollywood Bedtime</Text>
-            <Text style={styles.subtitle}>
-              Turn any movie into a sleepy-time story
-            </Text>
           </Animated.View>
 
-          {/* Main body — film grid is the hero on every breakpoint */}
-          <View style={isWide ? styles.wideBody : styles.narrowBody}>
-            {mainColumn}
-          </View>
+          {/* Child switcher — only when there's more than one */}
+          {kids.length > 1 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.kidRow}>
+              {kids.map((k) => {
+                const active = k.id === activeKid?.id;
+                return (
+                  <Pressable
+                    key={k.id}
+                    onPress={() => setActiveKid(k.id)}
+                    style={[styles.kidPill, active && styles.kidPillActive]}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                    accessibilityLabel={`Stories for ${k.name || "child"}, ages ${ageLabel(k.ageRange)}`}
+                  >
+                    <KidAvatar kid={k} size={26} />
+                    <Text style={[styles.kidName, active && styles.kidNameActive]}>{k.name || "Little one"}</Text>
+                    <Text style={[styles.kidAge, active && styles.kidNameActive]}>{ageLabel(k.ageRange)}</Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          ) : null}
 
-          {/* Marketing copy demoted to a footer below the grid */}
-          {marketingFooter}
-        </ScrollView>
-      </SafeAreaView>
+          <Animated.View entering={FadeIn.duration(500)} key={activeKid?.id}>
+            <TonightHero story={tonight} kidName={activeKid?.name} onPlay={playBundled} />
+          </Animated.View>
+
+          <StoryRow title="Made by you" stories={generated} onPlay={playGenerated} onDelete={deleteGenerated} />
+
+          {COLLECTIONS.map((c) => (
+            <StoryRow
+              key={c.key}
+              title={c.title}
+              subtitle={c.subtitle}
+              stories={bundled.filter((s) => s.collection === c.key)}
+              onPlay={playBundled}
+            />
+          ))}
+
+          <GenerateStory ageRange={ageRange} kidName={activeKid?.name} onGenerated={handleGenerated} />
+
+          <Text style={styles.footnote}>
+            Gentle retellings inspired by much-loved Indian films. Not affiliated with the films or their studios.
+          </Text>
+        </View>
+      </ScrollView>
+
+      {queue ? <NowPlayingScreen queue={queue} onClose={() => setQueue(null)} /> : null}
+      <SettingsSheet visible={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  safeArea: { flex: 1 },
-  scrollView: { flex: 1 },
-  scrollContent: { flexGrow: 1, paddingBottom: 60 },
+  scroll: { flexGrow: 1 },
+  column: { width: "100%", maxWidth: 960, alignSelf: "center" },
 
-  // Header
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 28,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderGoldFaint,
+    flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    paddingHorizontal: 20,
+    paddingBottom: 18,
+    gap: 12,
   },
-  moonEmoji: {
-    fontSize: 52,
-    marginBottom: 4,
-  },
-  titleMask: {
+  headerText: { flex: 1, gap: 2 },
+  greeting: {
     fontFamily: fonts.heading,
-    fontSize: 42,
-    lineHeight: 52,
-    textAlign: "center",
+    fontSize: 28,
+    lineHeight: 36,
     color: colors.goldLight,
   },
-  subtitle: {
+  moon: { fontSize: 24 },
+  subhead: {
+    fontFamily: fonts.bodySemiBold,
     fontSize: 14,
     color: colors.textTertiary,
-    letterSpacing: 0.5,
-    fontFamily: fonts.body,
-    textAlign: "center",
   },
-
-  // ── Wide layout (≥900px) — single centred column, no sidebars ─────────────
-  wideBody: {
-    paddingHorizontal: 28,
-    paddingTop: 32,
-    maxWidth: 880,
-    alignSelf: "center",
-    width: "100%",
-  },
-
-  // ── Narrow layout (<900px) ─────────────────────────────────────────────────
-  narrowBody: {
-    paddingHorizontal: 20,
-    paddingTop: 28,
-    maxWidth: 700,
-    alignSelf: "center",
-    width: "100%",
-  },
-
-  // Spacer between film grid (hero) and the generate block (secondary)
-  spacer: {
-    height: 28,
-  },
-
-  // ── Marketing footer ──────────────────────────────────────────────────────
-  marketingFooterWide: {
-    paddingHorizontal: 28,
-    paddingTop: 12,
-    maxWidth: 1100,
-    alignSelf: "center",
-    width: "100%",
-    marginTop: 16,
-  },
-  marketingFooterNarrow: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    maxWidth: 700,
-    alignSelf: "center",
-    width: "100%",
-    marginTop: 16,
-  },
-  marketingDivider: {
-    height: 1,
-    backgroundColor: colors.borderGoldFaint,
-    marginBottom: 32,
-  },
-  marketingRow: {
-    flexDirection: "row",
-    gap: 32,
-    alignItems: "flex-start",
-  },
-  marketingCol: {
-    flexDirection: "column",
-    gap: 24,
-  },
-  marketingCell: {
-    flex: 1,
-    minWidth: 0,
-  },
-
-  // Player
-  playerSection: {
-    marginBottom: 28,
-  },
-  playerHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-  nowPlaying: {
-    fontFamily: fonts.heading,
-    fontSize: 22,
-    color: colors.goldLight,
-    flex: 1,
-  },
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.07)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
+  gearBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 12,
-  },
-  closeBtnText: {
-    fontSize: 13,
-    color: colors.textTertiary,
+    backgroundColor: "rgba(255,255,255,0.07)",
   },
 
-  // Story text toggle
-  storyToggle: {
-    marginTop: 20,
-    paddingVertical: 8,
-  },
-  storyToggleText: {
-    fontFamily: fonts.body,
-    fontSize: 14,
-    color: colors.textTertiary,
-  },
-  storyTextScroll: {
-    marginTop: 12,
-    padding: 20,
-    borderRadius: 16,
-    backgroundColor: colors.surfaceVeryFaint,
+  kidRow: { paddingHorizontal: 20, gap: 8, paddingBottom: 16 },
+  kidPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    minHeight: 40,
+    paddingLeft: 6,
+    paddingRight: 14,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.06)",
     borderWidth: 1,
-    borderColor: colors.borderGoldFaint,
-    maxHeight: 400,
+    borderColor: "transparent",
   },
-  storyText: {
+  kidPillActive: { borderColor: colors.gold, backgroundColor: "rgba(246,166,35,0.14)" },
+  kidName: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.textSecondary },
+  kidAge: { fontFamily: fonts.body, fontSize: 13, color: colors.textTertiary },
+  kidNameActive: { color: colors.goldLight },
+
+  footnote: {
     fontFamily: fonts.body,
-    fontSize: 15,
-    lineHeight: 27,
-    color: colors.textPrimary,
+    fontSize: 12,
+    lineHeight: 17,
+    color: colors.textTertiary,
+    textAlign: "center",
+    paddingHorizontal: 32,
+    marginTop: 32,
   },
 });
