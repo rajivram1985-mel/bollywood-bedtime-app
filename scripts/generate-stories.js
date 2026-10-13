@@ -96,7 +96,43 @@ async function generateText(promptTitle, ageRange) {
 }
 
 // ─── ElevenLabs: narration ────────────────────────────────────────────────────
+// eleven_multilingual_v2 accepts at most 10,000 characters per request, and
+// 9-12 stories run ~15k. Long stories are split at paragraph breaks and the
+// MP3 parts concatenated (optimize-audio.js re-encodes the joined file).
+// previous_text/next_text keep the narration's intonation continuous.
+const MAX_REQUEST_CHARS = 9000;
+
+function splitForNarration(text) {
+  if (text.length <= MAX_REQUEST_CHARS) return [text];
+  const parts = [];
+  let buf = "";
+  for (const para of text.split(/\n\s*\n/)) {
+    if (buf && buf.length + para.length + 2 > MAX_REQUEST_CHARS) {
+      parts.push(buf);
+      buf = para;
+    } else {
+      buf = buf ? `${buf}\n\n${para}` : para;
+    }
+  }
+  if (buf) parts.push(buf);
+  return parts;
+}
+
 async function generateAudio(text) {
+  const parts = splitForNarration(text);
+  const buffers = [];
+  for (let i = 0; i < parts.length; i++) {
+    buffers.push(
+      await requestAudio(parts[i], {
+        previous_text: parts[i - 1]?.slice(-1000),
+        next_text: parts[i + 1]?.slice(0, 1000),
+      })
+    );
+  }
+  return Buffer.concat(buffers);
+}
+
+async function requestAudio(text, context = {}) {
   const res = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${process.env.ELEVENLABS_VOICE_ID}`,
     {
@@ -110,6 +146,7 @@ async function generateAudio(text) {
         text,
         model_id: "eleven_multilingual_v2",
         voice_settings: { stability: 0.6, similarity_boost: 0.75, style: 0.4, use_speaker_boost: true },
+        ...context,
       }),
     }
   );
@@ -152,6 +189,12 @@ async function main() {
   if (textJobs.length && !process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY not set");
   if (audioJobs.length && (!process.env.ELEVENLABS_API_KEY || !process.env.ELEVENLABS_VOICE_ID)) {
     throw new Error("ELEVENLABS_API_KEY and ELEVENLABS_VOICE_ID are required for --audio");
+  }
+  if (audioJobs.length && !process.env.ELEVENLABS_API_KEY.startsWith("sk_")) {
+    throw new Error(
+      "ELEVENLABS_API_KEY doesn't look like a secret key (they start with 'sk_'). " +
+        "The dashboard's key ID won't work — create a key under Developers → API Keys and copy it when shown."
+    );
   }
 
   // Text: run a few in parallel, save after each so a failure never loses work.
