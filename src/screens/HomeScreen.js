@@ -8,6 +8,7 @@ import NightSky from "../components/NightSky";
 import TonightHero from "../components/TonightHero";
 import StoryRow from "../components/StoryRow";
 import GenerateStory from "../components/GenerateStory";
+import { canGenerateStories } from "../utils/api";
 import KidAvatar from "../components/KidAvatar";
 import { GearIcon } from "../components/Icons";
 import NowPlayingScreen from "./NowPlayingScreen";
@@ -150,7 +151,9 @@ export default function HomeScreen() {
             />
           ))}
 
-          <GenerateStory ageRange={ageRange} language={language} kidName={activeKid?.name} onGenerated={handleGenerated} />
+          {canGenerateStories ? (
+            <GenerateStory ageRange={ageRange} language={language} kidName={activeKid?.name} onGenerated={handleGenerated} />
+          ) : null}
 
           <Text style={styles.footnote}>
             Gentle retellings inspired by much-loved Indian films. Not affiliated with the films or their studios.

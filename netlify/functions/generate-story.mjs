@@ -3,7 +3,26 @@
 
 import storyPrompt from "../../shared/story-prompt.cjs";
 
-const { buildStoryPrompt } = storyPrompt;
+const { buildStoryPrompt, AGE_KEYS, LANGUAGE_KEYS } = storyPrompt;
+
+// Film titles: letters in any script, digits, spaces and light punctuation.
+// No quotes, brackets or newlines — the title is embedded in the prompt, so
+// this keeps "titles" from smuggling in instructions.
+const TITLE_RE = /^[\p{L}\p{M}\p{N} .,:!?&'-]{1,60}$/u;
+
+// Best-effort abuse brake. Function instances are short-lived and not shared,
+// so this only stops bursts from one client hitting a warm instance; a real
+// per-device quota needs shared storage (e.g. Netlify Blobs) — see CLAUDE.md.
+const WINDOW_MS = 60 * 60 * 1000;
+const MAX_PER_WINDOW = 12;
+const hits = new Map();
+function rateLimited(ip) {
+  const now = Date.now();
+  const recent = (hits.get(ip) || []).filter((t) => now - t < WINDOW_MS);
+  recent.push(now);
+  hits.set(ip, recent);
+  return recent.length > MAX_PER_WINDOW;
+}
 
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), {
@@ -11,7 +30,7 @@ const json = (obj, status = 200) =>
     headers: { "Content-Type": "application/json" },
   });
 
-export default async (req) => {
+export default async (req, context) => {
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
   let body;
@@ -21,9 +40,19 @@ export default async (req) => {
     return json({ error: "Invalid JSON body" }, 400);
   }
 
-  const { movieName, ageRange = "6-8", language = "en" } = body;
-  if (!movieName || typeof movieName !== "string") {
-    return json({ error: "movieName is required" }, 400);
+  const { ageRange = "6-8", language = "en" } = body;
+  const movieName = typeof body.movieName === "string" ? body.movieName.trim().replace(/\s+/g, " ") : "";
+  if (!movieName) return json({ error: "Please type the name of a film." }, 400);
+  if (!TITLE_RE.test(movieName)) {
+    return json({ error: "That doesn't look like a film title — try just the film's name." }, 400);
+  }
+  if (!AGE_KEYS.includes(ageRange) || !LANGUAGE_KEYS.includes(language)) {
+    return json({ error: "Unsupported age or language." }, 400);
+  }
+
+  const ip = context?.ip || req.headers.get("x-nf-client-connection-ip") || "unknown";
+  if (rateLimited(ip)) {
+    return json({ error: "That's a lot of new stories! Please try again in a little while." }, 429);
   }
 
   const key = process.env.ANTHROPIC_API_KEY;

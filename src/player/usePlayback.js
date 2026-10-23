@@ -45,7 +45,11 @@ export function usePlayback(story, { autoPlay = true, onFinish } = {}) {
 
     (async () => {
       try {
-        await engine.load(story.audio || story.text, story.language);
+        await engine.load(story.audio || story.text, story.language, {
+          title: story.title,
+          subtitle: story.ageRange ? `Ages ${story.ageRange.replace("-", "–")}` : undefined,
+          illustration: story.illustration,
+        });
         if (cancelled) return;
         setStatus((p) => ({ ...p, isLoading: false }));
         if (autoPlay) await engine.play();

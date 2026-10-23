@@ -1,63 +1,82 @@
-import { Audio } from "expo-av";
+import { Image } from "react-native";
+import { createAudioPlayer } from "expo-audio";
 
-// Recorded narration (bundled .m4a). Same interface as speechEngine so the
-// player UI doesn't care which one it's driving. When migrating to
-// expo-audio (expo-av is removed in SDK 55), only this file changes.
+// Recorded narration (bundled .m4a) via expo-audio. Same interface as
+// speechEngine so the player UI doesn't care which one it's driving.
+//
+// The player registers with the OS lock screen / Control Centre / Android
+// media notification, so a parent can pause from a locked phone at bedtime.
+// Lock-screen and background behaviour must be checked on a real device —
+// it can't be exercised on web.
+
+function artworkUri(illustration) {
+  try {
+    return illustration ? Image.resolveAssetSource(illustration)?.uri : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 export function createAudioEngine({ onStatus }) {
-  let sound = null;
-  let loadToken = 0;
+  let player = null;
+  let subscription = null;
 
-  const handleStatus = (s) => {
-    if (!s.isLoaded) {
-      if (s.error) onStatus({ error: s.error, isPlaying: false });
-      return;
+  const release = () => {
+    subscription?.remove();
+    subscription = null;
+    if (player) {
+      try {
+        player.clearLockScreenControls?.();
+      } catch {}
+      try {
+        player.remove();
+      } catch {}
     }
-    onStatus({
-      isPlaying: s.isPlaying,
-      positionSec: s.positionMillis / 1000,
-      durationSec: s.durationMillis ? s.durationMillis / 1000 : undefined,
-      didJustFinish: s.didJustFinish,
-    });
-  };
-
-  const unloadSound = async () => {
-    const s = sound;
-    sound = null;
-    if (s) await s.unloadAsync().catch(() => {});
+    player = null;
   };
 
   return {
     kind: "audio",
 
-    async load(source) {
-      const myToken = ++loadToken;
-      await unloadSound();
-      const { sound: s } = await Audio.Sound.createAsync(
-        source,
-        { shouldPlay: false, progressUpdateIntervalMillis: 500 },
-        handleStatus
-      );
-      if (myToken !== loadToken) {
-        s.unloadAsync().catch(() => {});
-        return;
+    async load(source, _language, meta = {}) {
+      release();
+      player = createAudioPlayer(source, { updateInterval: 500 });
+      subscription = player.addListener("playbackStatusUpdate", (s) => {
+        onStatus({
+          isPlaying: s.playing,
+          positionSec: s.currentTime,
+          durationSec: s.duration || undefined,
+          didJustFinish: s.didJustFinish,
+        });
+      });
+      try {
+        player.setActiveForLockScreen?.(
+          true,
+          {
+            title: meta.title,
+            artist: "Bollywood Bedtime",
+            albumTitle: meta.subtitle,
+            artworkUrl: artworkUri(meta.illustration),
+          },
+          { showSeekBackward: true, showSeekForward: true }
+        );
+      } catch {
+        // Lock-screen controls are a nicety; playback works without them.
       }
-      sound = s;
     },
 
     play: async () => {
-      await sound?.playAsync();
+      player?.play();
     },
     pause: async () => {
-      await sound?.pauseAsync();
+      player?.pause();
     },
     seekTo: async (sec) => {
-      await sound?.setPositionAsync(Math.max(0, sec) * 1000);
+      await player?.seekTo(Math.max(0, sec));
     },
 
     async unload() {
-      loadToken++;
-      await unloadSound();
+      release();
     },
   };
 }
