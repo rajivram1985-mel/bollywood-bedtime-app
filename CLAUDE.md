@@ -47,16 +47,22 @@ To add a film: add it to `FILMS` in both `src/data/films.js` and `scripts/genera
 
 [src/player/usePlayback.js](src/player/usePlayback.js) drives one story through one of two engines with the same interface (`load/play/pause/seekTo/unload`, status callbacks):
 
-- [audioEngine.js](src/player/audioEngine.js) — bundled `.m4a` via `expo-av`. `expo-av` is removed in SDK 55; migrating to `expo-audio` should only touch this file.
+- [audioEngine.js](src/player/audioEngine.js) — bundled `.m4a` via `expo-audio` (`createAudioPlayer`). Registers lock-screen / Control Centre / Android media controls with title and artwork (no-op on web). `expo-audio` declares `expo-asset` as an open peer dependency — keep `expo-asset` pinned to the SDK's version as a direct dependency or npm pulls a newer SDK's build and Metro fails on `expo/internal/bundle-origin`.
 - [speechEngine.js](src/player/speechEngine.js) — device TTS via `expo-speech` / `window.speechSynthesis`. Text is spoken in ~220-char sentence chunks because Android TTS rejects input over 4000 chars and Chromium cuts long utterances off. Position/duration are estimated from characters; seeking snaps to chunk boundaries but always moves at least one chunk. Splits on । as well as . ! ?. Voice choice is per language: en-IN first for English, hi-IN only for Hindi — on web, a Hindi story with no Hindi voice installed fails with `NoVoiceError` and a read-along hint rather than mangling Devanagari with an English voice.
 
 [NowPlayingScreen](src/screens/NowPlayingScreen.js) owns the bedtime session: a queue (tapped story first, then the rest of the catalogue), "stories tonight" count (1–3) instead of a minutes timer, auto-advance, a goodnight screen when done, read-along text, and dim mode (manual, plus automatic after 45 s idle while playing).
 
-iOS background audio is enabled via `UIBackgroundModes: ["audio"]` in [app.json](app.json) plus `Audio.setAudioModeAsync({ staysActiveInBackground: true, ... })` in [App.js](App.js). Background behaviour of the chunked TTS path has not been verified on a device.
+iOS background audio is enabled via `UIBackgroundModes: ["audio"]` in [app.json](app.json) plus `setAudioModeAsync({ shouldPlayInBackground: true, playsInSilentMode: true, interruptionMode: "doNotMix" })` in [App.js](App.js). The `expo-audio` plugin is configured with `microphonePermission: false` and Android blocks `RECORD_AUDIO` — the app must never ask for the mic. Background and lock-screen behaviour (both engines) has not been verified on a device.
 
-### Story generation is server-side (web only for now)
+### Story generation is server-side
 
-The client posts `{ movieName, ageRange }` to `/.netlify/functions/generate-story` and reads Anthropic's SSE stream. This only works on web: native has no origin for the relative URL and React Native's `fetch` has no streaming body. For local dev run `netlify dev` (port 8888); plain `npm run web` 404s on the function. Generated stories are saved under "Made by you" and always use device TTS.
+The client ([src/utils/api.js](src/utils/api.js)) posts `{ movieName, ageRange, language }` to `${EXPO_PUBLIC_API_BASE_URL}/.netlify/functions/generate-story` and reads Anthropic's SSE stream. On web the base URL is empty (same origin). On native it must point at the deployed site; `expo/fetch` provides the streaming body that RN's built-in fetch lacks, and a hand-rolled streaming UTF-8 decoder covers Hermes builds without `TextDecoder`. If the env var is unset on native, the "make a story" section is hidden (`canGenerateStories`). For local dev run `netlify dev` (port 8888); plain `npm run web` 404s on the function. Generated stories are saved under "Made by you" and always use device TTS.
+
+The function validates the title against a plain-title character class (no quotes/brackets/newlines, ≤60 chars) because it's embedded in the prompt, whitelists age and language, and applies a best-effort per-IP limit (12/hour per warm instance — not a real quota; a durable per-device quota needs shared storage such as Netlify Blobs).
+
+### Store readiness
+
+[eas.json](eas.json) has `preview` (internal, Android APK) and `production` profiles. Still missing before a store build: `ios.bundleIdentifier` / `android.package` (a permanent identity — the owner's decision), the contact email in [public/privacy.html](public/privacy.html) (a draft written from what the code does; update it whenever data handling changes), and `EXPO_PUBLIC_API_BASE_URL` for the build.
 
 ### Storage
 
