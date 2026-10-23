@@ -8,9 +8,12 @@ import NightSky from "../components/NightSky";
 import TonightHero from "../components/TonightHero";
 import StoryRow from "../components/StoryRow";
 import GenerateStory from "../components/GenerateStory";
+import ArchFrame from "../components/ArchFrame";
+import StoryArt from "../components/StoryArt";
+import { Divider } from "../components/Ornament";
 import { canGenerateStories } from "../utils/api";
 import KidAvatar from "../components/KidAvatar";
-import { GearIcon } from "../components/Icons";
+import { GearIcon, PlayIcon } from "../components/Icons";
 import NowPlayingScreen from "./NowPlayingScreen";
 import SettingsSheet from "./SettingsSheet";
 
@@ -23,9 +26,35 @@ import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
 function greetingFor(name) {
-  const evening = new Date().getHours() >= 17 || new Date().getHours() < 4;
-  const hello = evening ? "Shubh ratri" : "Namaste";
+  const h = new Date().getHours();
+  const hello = h >= 17 || h < 4 ? "Shubh ratri" : "Namaste";
   return name ? `${hello}, ${name}` : hello;
+}
+
+// Little ones ask for the same story again and again — make that one tap.
+function PlayAgain({ story, onPlay }) {
+  return (
+    <Pressable
+      onPress={() => onPlay(story)}
+      style={({ pressed }) => [styles.again, pressed && { opacity: 0.85 }]}
+      accessibilityRole="button"
+      accessibilityLabel={`Play ${story.title} again`}
+    >
+      <ArchFrame width={40} style={{ height: 52 }} inset={0} bottomRadius={8}>
+        <StoryArt story={story} emojiSize={16} />
+      </ArchFrame>
+      <View style={styles.againText}>
+        <Text style={styles.againEyebrow}>Last time</Text>
+        <Text style={styles.againTitle} numberOfLines={1}>
+          {story.title}
+        </Text>
+      </View>
+      <View style={styles.againBtn}>
+        <PlayIcon size={14} color={colors.marigold} />
+        <Text style={styles.againBtnText}>Again</Text>
+      </View>
+    </Pressable>
+  );
 }
 
 export default function HomeScreen() {
@@ -50,12 +79,21 @@ export default function HomeScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [bundled, activeKid?.id]
   );
+  const lastStory = useMemo(() => {
+    const id = recentIds[0];
+    if (!id || id === tonight?.id) return null;
+    return bundled.find((s) => s.id === id) ?? generated.find((s) => s.id === id) ?? null;
+  }, [recentIds, bundled, generated, tonight]);
 
   const playBundled = useCallback((story) => setQueue(buildQueue(bundled, story.id)), [bundled]);
   const playGenerated = useCallback(
     (story) => setQueue([story, ...buildQueue(bundled, tonight?.id)]),
     [bundled, tonight]
   );
+  const playAny = useCallback((story) => (story.kind === "generated" ? playGenerated(story) : playBundled(story)), [
+    playBundled,
+    playGenerated,
+  ]);
 
   const handleGenerated = useCallback(
     (saved) => {
@@ -78,28 +116,30 @@ export default function HomeScreen() {
     });
   }, []);
 
+  const subhead = [`Ages ${ageLabel(ageRange)}`, language !== "en" ? languageLabel(language) : null]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <LinearGradient
       colors={[colors.bgTop, colors.bgMid1, colors.bgMid2, colors.bgBottom]}
-      locations={[0, 0.3, 0.6, 1]}
+      locations={[0, 0.35, 0.7, 1]}
       style={styles.root}
     >
       <NightSky />
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 48 }]}
+        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + 14, paddingBottom: insets.bottom + 56 }]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.column}>
           {/* Header */}
           <Animated.View entering={FadeInDown.duration(400)} style={styles.header}>
+            <KidAvatar kid={activeKid} size={46} />
             <View style={styles.headerText}>
               <Text style={styles.greeting} numberOfLines={1}>
-                {greetingFor(activeKid?.name)} <Text style={styles.moon}>🌙</Text>
+                {greetingFor(activeKid?.name)}
               </Text>
-              <Text style={styles.subhead}>
-                Bedtime stories for ages {ageLabel(ageRange)}
-                {language !== "en" ? ` · ${languageLabel(language)}` : ""}
-              </Text>
+              <Text style={styles.subhead}>{subhead}</Text>
             </View>
             <Pressable
               onPress={() => setSettingsOpen(true)}
@@ -108,7 +148,7 @@ export default function HomeScreen() {
               accessibilityRole="button"
               accessibilityLabel="Family and settings"
             >
-              <GearIcon color={colors.textPrimary} />
+              <GearIcon color={colors.textSecondary} />
             </Pressable>
           </Animated.View>
 
@@ -128,16 +168,17 @@ export default function HomeScreen() {
                   >
                     <KidAvatar kid={k} size={26} />
                     <Text style={[styles.kidName, active && styles.kidNameActive]}>{k.name || "Little one"}</Text>
-                    <Text style={[styles.kidAge, active && styles.kidNameActive]}>{ageLabel(k.ageRange)}</Text>
                   </Pressable>
                 );
               })}
             </ScrollView>
           ) : null}
 
-          <Animated.View entering={FadeIn.duration(500)} key={activeKid?.id}>
+          <Animated.View entering={FadeIn.duration(600)} key={`${activeKid?.id}-${language}-${ageRange}`} style={styles.hero}>
             <TonightHero story={tonight} kidName={activeKid?.name} onPlay={playBundled} />
           </Animated.View>
+
+          {lastStory ? <PlayAgain story={lastStory} onPlay={playAny} /> : null}
 
           <StoryRow title="Made by you" stories={generated} onPlay={playGenerated} onDelete={deleteGenerated} />
 
@@ -155,9 +196,12 @@ export default function HomeScreen() {
             <GenerateStory ageRange={ageRange} language={language} kidName={activeKid?.name} onGenerated={handleGenerated} />
           ) : null}
 
-          <Text style={styles.footnote}>
-            Gentle retellings inspired by much-loved Indian films. Not affiliated with the films or their studios.
-          </Text>
+          <View style={styles.footer}>
+            <Divider width={140} />
+            <Text style={styles.footnote}>
+              Gentle retellings inspired by much-loved Indian films. Not affiliated with the films or their studios.
+            </Text>
+          </View>
         </View>
       </ScrollView>
 
@@ -176,21 +220,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingBottom: 18,
-    gap: 12,
+    paddingBottom: 14,
+    gap: 14,
   },
-  headerText: { flex: 1, gap: 2 },
+  headerText: { flex: 1, gap: 1 },
   greeting: {
     fontFamily: fonts.heading,
-    fontSize: 28,
-    lineHeight: 36,
-    color: colors.goldLight,
+    fontSize: 26,
+    lineHeight: 33,
+    color: colors.cream,
   },
-  moon: { fontSize: 24 },
   subhead: {
     fontFamily: fonts.bodySemiBold,
     fontSize: 14,
-    color: colors.textTertiary,
+    color: colors.marigoldSoft,
+    opacity: 0.85,
   },
   gearBtn: {
     width: 44,
@@ -198,27 +242,66 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.07)",
+    backgroundColor: colors.chip,
+    borderWidth: 1,
+    borderColor: colors.chipBorder,
   },
 
-  kidRow: { paddingHorizontal: 20, gap: 8, paddingBottom: 16 },
+  kidRow: { paddingHorizontal: 20, gap: 8, paddingBottom: 6 },
   kidPill: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
     minHeight: 40,
     paddingLeft: 6,
-    paddingRight: 14,
+    paddingRight: 16,
     borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.06)",
+    backgroundColor: colors.chip,
     borderWidth: 1,
-    borderColor: "transparent",
+    borderColor: colors.chipBorder,
   },
-  kidPillActive: { borderColor: colors.gold, backgroundColor: "rgba(246,166,35,0.14)" },
+  kidPillActive: { borderColor: colors.marigold, backgroundColor: "rgba(245,165,36,0.14)" },
   kidName: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.textSecondary },
-  kidAge: { fontFamily: fonts.body, fontSize: 13, color: colors.textTertiary },
-  kidNameActive: { color: colors.goldLight },
+  kidNameActive: { color: colors.marigoldSoft },
 
+  hero: { marginTop: 18 },
+
+  again: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    marginHorizontal: 20,
+    marginTop: 28,
+    padding: 10,
+    paddingRight: 12,
+    borderRadius: 18,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.lineSoft,
+    maxWidth: 520,
+  },
+  againText: { flex: 1 },
+  againEyebrow: {
+    fontFamily: fonts.bodyBold,
+    fontSize: 11,
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+    color: colors.textTertiary,
+  },
+  againTitle: { fontFamily: fonts.headingMedium, fontSize: 17, lineHeight: 22, color: colors.cream },
+  againBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    minHeight: 38,
+    paddingHorizontal: 14,
+    borderRadius: 19,
+    borderWidth: 1,
+    borderColor: colors.line,
+  },
+  againBtnText: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.marigold },
+
+  footer: { marginTop: 44, gap: 14, alignItems: "center" },
   footnote: {
     fontFamily: fonts.body,
     fontSize: 12,
@@ -226,6 +309,5 @@ const styles = StyleSheet.create({
     color: colors.textTertiary,
     textAlign: "center",
     paddingHorizontal: 32,
-    marginTop: 32,
   },
 });

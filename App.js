@@ -45,7 +45,7 @@ function Root() {
   if (!ready) return null;
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0a0620" }} onLayout={onLayoutRootView}>
+    <View style={{ flex: 1, backgroundColor: "#0D0C26" }} onLayout={onLayoutRootView}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       {profiles.kids.length > 0 ? <HomeScreen /> : <OnboardingScreen />}
     </View>

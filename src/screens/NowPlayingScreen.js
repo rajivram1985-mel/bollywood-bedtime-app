@@ -6,6 +6,8 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import StoryArt from "../components/StoryArt";
+import ArchFrame from "../components/ArchFrame";
+import { Divider, Phool } from "../components/Ornament";
 import NightSky from "../components/NightSky";
 import { PlayIcon, PauseIcon, BackIcon, ForwardIcon, ChevronDownIcon, MoonIcon, BookIcon } from "../components/Icons";
 import { usePlayback } from "../player/usePlayback";
@@ -38,6 +40,9 @@ export default function NowPlayingScreen({ queue, onClose }) {
   const [finished, setFinished] = useState(false);
   const [dimmed, setDimmed] = useState(false);
   const [readAlong, setReadAlong] = useState(false);
+  const [stage, setStage] = useState({ w: 0, h: 0 });
+  // The arch fills the space it's given at a 3:4 ratio, whichever side limits it.
+  const artW = Math.min(stage.w, stage.h * 0.76);
 
   const story = queue[index];
   const playedRef = useRef(played);
@@ -106,7 +111,11 @@ export default function NowPlayingScreen({ queue, onClose }) {
               >
                 <ChevronDownIcon color={colors.textPrimary} />
               </Pressable>
-              <Text style={styles.topLabel}>{headerLabel}</Text>
+              <View style={styles.topLabelRow}>
+                <Phool size={9} />
+                <Text style={styles.topLabel}>{headerLabel}</Text>
+                <Phool size={9} />
+              </View>
               <Pressable
                 onPress={() => setDimmed(true)}
                 style={styles.iconBtn}
@@ -114,12 +123,12 @@ export default function NowPlayingScreen({ queue, onClose }) {
                 accessibilityRole="button"
                 accessibilityLabel="Dim the screen"
               >
-                <MoonIcon size={20} color={colors.goldLight} />
+                <MoonIcon size={20} color={colors.marigoldSoft} />
               </Pressable>
             </View>
 
             {/* Artwork or read-along text */}
-            <View style={styles.stage}>
+            <View style={styles.stage} onLayout={(e) => setStage({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
               {readAlong ? (
                 <ScrollView style={styles.textPanel} contentContainerStyle={styles.textPanelContent}>
                   <Text style={[styles.storyText, story.language === "hi" && styles.storyTextHi]} selectable>
@@ -127,9 +136,11 @@ export default function NowPlayingScreen({ queue, onClose }) {
                   </Text>
                 </ScrollView>
               ) : (
-                <View style={styles.artFrame}>
-                  <StoryArt story={story} emojiSize={72} />
-                </View>
+                artW > 0 ? (
+                  <ArchFrame width={artW} style={{ height: artW / 0.76, alignSelf: "center" }} glow={player.isPlaying}>
+                    <StoryArt story={story} emojiSize={72} />
+                  </ArchFrame>
+                ) : null
               )}
             </View>
 
@@ -183,12 +194,7 @@ export default function NowPlayingScreen({ queue, onClose }) {
                 accessibilityLabel={player.isPlaying ? "Pause" : "Play"}
                 style={({ pressed }) => pressed && { transform: [{ scale: 0.96 }] }}
               >
-                <LinearGradient
-                  colors={[colors.goldLight, colors.gold, colors.orange]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.playBtn}
-                >
+                <View style={styles.playBtn}>
                   {player.isLoading ? (
                     <ActivityIndicator color={colors.onGold} />
                   ) : player.isPlaying ? (
@@ -196,7 +202,7 @@ export default function NowPlayingScreen({ queue, onClose }) {
                   ) : (
                     <PlayIcon size={32} color={colors.onGold} />
                   )}
-                </LinearGradient>
+                </View>
               </Pressable>
 
               <Pressable
@@ -262,7 +268,7 @@ export default function NowPlayingScreen({ queue, onClose }) {
               accessibilityRole="button"
               accessibilityLabel="Screen dimmed. Tap to brighten."
             >
-              <MoonIcon size={28} color="rgba(252,216,157,0.35)" />
+              <MoonIcon size={28} color="rgba(255,207,125,0.3)" />
               <Text style={styles.dimText}>{player.isPlaying ? story.title : "Paused"}</Text>
               <Text style={styles.dimHint}>Tap to brighten</Text>
             </Pressable>
@@ -272,8 +278,9 @@ export default function NowPlayingScreen({ queue, onClose }) {
         {/* Goodnight — shown when tonight's stories are done */}
         {finished ? (
           <Animated.View entering={FadeIn.duration(1500)} style={[StyleSheet.absoluteFill, styles.goodnight]}>
-            <MoonIcon size={64} color={colors.goldLight} />
+            <MoonIcon size={64} color={colors.marigoldSoft} />
             <Text style={styles.gnTitle}>{greeting(activeKid?.name)}</Text>
+            <Divider width={120} />
             <Text style={styles.gnBody}>Sweet dreams. That's all the stories for tonight.</Text>
             <View style={styles.gnActions}>
               <Pressable onPress={oneMore} style={styles.gnSecondary} accessibilityRole="button">
@@ -302,36 +309,28 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.06)",
+    backgroundColor: colors.chip,
+    borderWidth: 1,
+    borderColor: colors.chipBorder,
   },
+  topLabelRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   topLabel: {
     fontFamily: fonts.bodyBold,
     fontSize: 12,
-    letterSpacing: 1.2,
+    letterSpacing: 1.4,
     textTransform: "uppercase",
-    color: colors.textSecondary,
+    color: colors.marigoldSoft,
   },
 
   stage: { flex: 1, minHeight: 160, justifyContent: "center" },
-  artFrame: {
-    height: "100%",
-    maxWidth: "100%",
-    aspectRatio: 3 / 4,
-    alignSelf: "center",
-    borderRadius: 24,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.borderGold,
-    backgroundColor: "#140c2e",
-  },
   textPanel: {
     flex: 1,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.04)",
+    borderRadius: 24,
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: colors.borderGoldFaint,
+    borderColor: colors.lineSoft,
   },
-  textPanelContent: { padding: 22 },
+  textPanelContent: { padding: 24 },
   storyText: {
     fontFamily: fonts.body,
     fontSize: 19,
@@ -346,21 +345,21 @@ const styles = StyleSheet.create({
     lineHeight: 38,
   },
 
-  titleBlock: { gap: 4 },
-  title: { fontFamily: fonts.heading, fontSize: 28, lineHeight: 34, color: colors.white },
-  meta: { fontFamily: fonts.bodySemiBold, fontSize: 13, color: colors.textTertiary },
+  titleBlock: { gap: 4, alignItems: "center" },
+  title: { fontFamily: fonts.heading, fontSize: 30, lineHeight: 36, color: colors.cream, textAlign: "center" },
+  meta: { fontFamily: fonts.bodySemiBold, fontSize: 13, color: colors.textTertiary, textAlign: "center" },
 
   slider: { width: "100%", height: 32 },
   timeRow: { flexDirection: "row", justifyContent: "space-between", marginTop: -2 },
   time: { fontFamily: fonts.bodySemiBold, fontSize: 12, color: colors.textTertiary },
 
-  transport: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 36 },
+  transport: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 40 },
   skipBtn: { width: 56, height: 56, alignItems: "center", justifyContent: "center" },
   skipText: {
     position: "absolute",
     fontFamily: fonts.bodyBold,
     fontSize: 9,
-    color: colors.textPrimary,
+    color: colors.textSecondary,
     top: 23,
   },
   playBtn: {
@@ -369,15 +368,16 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: colors.gold,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
+    backgroundColor: colors.marigold,
+    shadowColor: colors.marigold,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 18,
     elevation: 8,
   },
-  error: { fontFamily: fonts.body, fontSize: 13, color: colors.error, textAlign: "center" },
+  error: { fontFamily: fonts.bodySemiBold, fontSize: 13, lineHeight: 18, color: colors.error, textAlign: "center" },
 
-  bedtimeRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" },
+  bedtimeRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" },
   chip: {
     flexDirection: "row",
     alignItems: "center",
@@ -385,50 +385,54 @@ const styles = StyleSheet.create({
     minHeight: 40,
     paddingHorizontal: 14,
     borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.07)",
+    backgroundColor: colors.chip,
+    borderWidth: 1,
+    borderColor: colors.chipBorder,
   },
-  chipActive: { backgroundColor: colors.gold },
+  chipActive: { backgroundColor: colors.marigold, borderColor: colors.marigold },
   chipText: { fontFamily: fonts.bodySemiBold, fontSize: 14, color: colors.textPrimary },
   chipTextActive: { color: colors.onGold },
-  countGroup: { flexDirection: "row", alignItems: "center", gap: 6 },
-  countLabel: { fontFamily: fonts.bodySemiBold, fontSize: 13, color: colors.textTertiary, marginRight: 2 },
+  countGroup: { flexDirection: "row", alignItems: "center", gap: 5 },
+  countLabel: { fontFamily: fonts.bodySemiBold, fontSize: 13, color: colors.textTertiary, marginRight: 1 },
   countPill: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.07)",
+    backgroundColor: colors.chip,
+    borderWidth: 1,
+    borderColor: colors.chipBorder,
   },
-  bedtimeHint: { fontFamily: fonts.body, fontSize: 12, color: colors.textTertiary, textAlign: "right", marginTop: -8 },
+  bedtimeHint: { fontFamily: fonts.body, fontSize: 12, color: colors.textTertiary, textAlign: "center", marginTop: -6 },
 
   dim: {
     flex: 1,
-    backgroundColor: "rgba(2,1,8,0.95)",
+    backgroundColor: "rgba(4,3,14,0.96)",
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
   },
-  dimText: { fontFamily: fonts.bodySemiBold, fontSize: 14, color: "rgba(255,255,255,0.3)" },
-  dimHint: { fontFamily: fonts.body, fontSize: 12, color: "rgba(255,255,255,0.2)" },
+  dimText: { fontFamily: fonts.bodySemiBold, fontSize: 14, color: "rgba(255,243,222,0.3)" },
+  dimHint: { fontFamily: fonts.body, fontSize: 12, color: "rgba(255,243,222,0.2)" },
 
   goodnight: {
-    backgroundColor: "rgba(4,2,14,0.97)",
+    backgroundColor: "rgba(8,7,28,0.97)",
     alignItems: "center",
     justifyContent: "center",
     padding: 32,
-    gap: 12,
+    gap: 14,
   },
-  gnTitle: { fontFamily: fonts.heading, fontSize: 30, lineHeight: 38, color: colors.goldLight, textAlign: "center", marginTop: 8 },
+  gnTitle: { fontFamily: fonts.heading, fontSize: 32, lineHeight: 40, color: colors.cream, textAlign: "center", marginTop: 8 },
   gnBody: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.textTertiary, textAlign: "center" },
-  gnActions: { flexDirection: "row", gap: 12, marginTop: 24 },
+  gnActions: { flexDirection: "row", gap: 12, marginTop: 20 },
   gnSecondary: {
     minHeight: 44,
     paddingHorizontal: 18,
     borderRadius: 22,
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
+    borderColor: colors.line,
   },
   gnSecondaryText: { fontFamily: fonts.bodySemiBold, fontSize: 14, color: colors.textSecondary },
 });

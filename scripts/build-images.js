@@ -30,7 +30,7 @@ function lights() {
   for (let i = 0; i <= 8; i++) {
     const t = i / 8;
     const x = 120 + t * 784;
-    const y = 150 + Math.sin(t * Math.PI) * 70;
+    const y = 84 + Math.sin(t * Math.PI) * 44;
     pts.push([x, y]);
   }
   const string = `<path d="M${pts.map((p) => p.join(" ")).join(" L")}" stroke="#F6A623" stroke-opacity="0.35" stroke-width="5" fill="none"/>`;
@@ -65,19 +65,37 @@ function moon(cx, cy, r) {
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#moonFill)" mask="url(#crescent)"/>`;
 }
 
+// The jharokha (arched window) used throughout the app, with a painted inset.
+function archPath(x0, x1, top, bottom, r = 36) {
+  const w = x1 - x0;
+  const R = w / 2;
+  return `M${x0} ${bottom - r} L${x0} ${top + R} A${R} ${R} 0 0 1 ${x1} ${top + R} L${x1} ${bottom - r} Q${x1} ${bottom} ${x1 - r} ${bottom} L${x0 + r} ${bottom} Q${x0} ${bottom} ${x0} ${bottom - r} Z`;
+}
+
+function windowMark() {
+  return `
+    <defs>
+      <linearGradient id="pane" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2B2B6B"/><stop offset="1" stop-color="#151540"/>
+      </linearGradient>
+    </defs>
+    <path d="${archPath(262, 762, 214, 862)}" fill="url(#pane)" stroke="#FFCF7D" stroke-opacity="0.55" stroke-width="10"/>
+    <path d="${archPath(292, 732, 244, 832, 20)}" fill="none" stroke="#FFCF7D" stroke-opacity="0.45" stroke-width="5"/>
+    ${moon(500, 560, 168)}
+    ${sparkle(650, 430, 30)}
+    ${sparkle(372, 400, 20, 0.85)}
+    ${sparkle(640, 720, 16, 0.7)}`;
+}
+
 function iconSvg({ background = true, scale = 1 } = {}) {
   const bg = background
     ? `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-         <stop offset="0" stop-color="#2A1A5E"/><stop offset="1" stop-color="#0A0620"/>
+         <stop offset="0" stop-color="#1A1A4D"/><stop offset="1" stop-color="#08071C"/>
        </linearGradient></defs>
        <rect width="1024" height="1024" fill="url(#sky)"/>
        ${lights()}`
     : "";
-  const content = `
-    ${moon(500, 580, 270)}
-    ${sparkle(770, 430, 46)}
-    ${sparkle(250, 380, 30, 0.85)}
-    ${sparkle(800, 790, 24, 0.7)}`;
+  const content = windowMark();
   const s = scale;
   const t = (1024 * (1 - s)) / 2;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">

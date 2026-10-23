@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import Svg, { Defs, RadialGradient, Stop, Circle } from "react-native-svg";
+import Svg, { Path, Defs, Mask, Rect, Circle } from "react-native-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   FadeIn,
@@ -11,94 +11,59 @@ import Animated, {
   withRepeat,
   withSequence,
   withTiming,
-  withDelay,
+  Easing,
 } from "react-native-reanimated";
 import NightSky from "../components/NightSky";
+import ArchFrame from "../components/ArchFrame";
+import { Divider } from "../components/Ornament";
+import LanguageSegmented from "../components/LanguageSegmented";
 import { AGE_RANGES } from "../constants/ageRanges";
 import { STORY_LANGUAGES, DEFAULT_LANGUAGE } from "../constants/languages";
-import LanguageSegmented from "../components/LanguageSegmented";
 import { useProfiles } from "../state/ProfileContext";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
-// ─── Decorative: glowing moon + drifting sparkles ────────────────────────────
-function MoonCluster() {
-  const glow = useSharedValue(0.55);
+// ─── Brand moment: a crescent moon seen through a jharokha ───────────────────
+function MoonWindow() {
   const float = useSharedValue(0);
-
   useEffect(() => {
-    glow.value = withRepeat(
-      withSequence(
-        withTiming(0.95, { duration: 2400 }),
-        withTiming(0.55, { duration: 2400 })
-      ),
-      -1,
-      true
-    );
     float.value = withRepeat(
       withSequence(
-        withTiming(-4, { duration: 3200 }),
-        withTiming(0, { duration: 3200 })
+        withTiming(-5, { duration: 3400, easing: Easing.inOut(Easing.sin) }),
+        withTiming(0, { duration: 3400, easing: Easing.inOut(Easing.sin) })
       ),
       -1,
       true
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const glowStyle = useAnimatedStyle(() => ({ opacity: glow.value }));
-  const floatStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: float.value }],
-  }));
+  const floatStyle = useAnimatedStyle(() => ({ transform: [{ translateY: float.value }] }));
 
   return (
-    <View style={styles.moonCluster}>
-      {/* Soft radial glow — a plain View with shadow renders as a hard disc on web/Android */}
-      <Animated.View style={[styles.moonHalo, glowStyle]} pointerEvents="none">
-        <Svg width="100%" height="100%" viewBox="0 0 100 100">
+    <ArchFrame width={136} style={{ height: 172 }} glow>
+      <LinearGradient colors={[colors.night500, colors.night700]} style={StyleSheet.absoluteFill} />
+      <Svg width="100%" height="100%" viewBox="0 0 136 172" style={StyleSheet.absoluteFill}>
+        <Path d="M30 54 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill={colors.marigoldSoft} opacity={0.8} />
+        <Path d="M104 40 l1.5 3.5 3.5 1.5 -3.5 1.5 -1.5 3.5 -1.5 -3.5 -3.5 -1.5 3.5 -1.5z" fill={colors.marigoldSoft} opacity={0.6} />
+        <Circle cx={100} cy={128} r={1.6} fill={colors.cream} opacity={0.5} />
+        <Circle cx={38} cy={120} r={1.2} fill={colors.cream} opacity={0.4} />
+      </Svg>
+      <Animated.View style={[styles.moonWrap, floatStyle]}>
+        <Svg width={64} height={64} viewBox="0 0 64 64">
           <Defs>
-            <RadialGradient id="halo" cx="50" cy="50" r="50" gradientUnits="userSpaceOnUse">
-              <Stop offset="0" stopColor={colors.gold} stopOpacity="0.45" />
-              <Stop offset="1" stopColor={colors.gold} stopOpacity="0" />
-            </RadialGradient>
+            <Mask id="crescent">
+              <Rect width="64" height="64" fill="white" />
+              <Circle cx="42" cy="24" r="24" fill="black" />
+            </Mask>
           </Defs>
-          <Circle cx="50" cy="50" r="50" fill="url(#halo)" />
+          <Circle cx="30" cy="34" r="27" fill={colors.marigoldSoft} mask="url(#crescent)" />
         </Svg>
       </Animated.View>
-      <Animated.Text style={[styles.moon, floatStyle]}>🌙</Animated.Text>
-      <Sparkle top={2} left={"22%"} delay={0} />
-      <Sparkle top={20} left={"78%"} delay={600} small />
-      <Sparkle top={56} left={"15%"} delay={1200} small />
-      <Sparkle top={62} left={"82%"} delay={1800} />
-    </View>
+    </ArchFrame>
   );
 }
 
-function Sparkle({ top, left, delay = 0, small = false }) {
-  const o = useSharedValue(0);
-  useEffect(() => {
-    o.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          withTiming(1, { duration: 900 }),
-          withTiming(0.15, { duration: 900 })
-        ),
-        -1,
-        true
-      )
-    );
-  }, []);
-  const style = useAnimatedStyle(() => ({ opacity: o.value }));
-  return (
-    <Animated.Text
-      style={[small ? styles.sparkleSmall : styles.sparkle, { top, left }, style]}
-    >
-      ✦
-    </Animated.Text>
-  );
-}
-
-// ─── Single-screen onboarding: who's listening (name + age) ──────────────────
+// ─── Single-screen onboarding: who's listening (name, age, language) ─────────
 export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
   const { addKid } = useProfiles();
@@ -117,45 +82,29 @@ export default function OnboardingScreen() {
   return (
     <LinearGradient
       colors={[colors.bgTop, colors.bgMid1, colors.bgMid2, colors.bgBottom]}
-      locations={[0, 0.3, 0.6, 1]}
+      locations={[0, 0.35, 0.7, 1]}
       style={styles.root}
     >
       <NightSky />
-      <KeyboardAvoidingView style={styles.safeArea} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 48 }]}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 28, paddingBottom: insets.bottom + 48 }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Compact brand header */}
-          <Animated.View entering={FadeIn.duration(500)} style={styles.brandHeader}>
-            <MoonCluster />
+          <Animated.View entering={FadeIn.duration(600)} style={styles.brand}>
+            <MoonWindow />
             <Text style={styles.brandName}>Bollywood Bedtime</Text>
-            <View style={styles.trustRow}>
-              <Text style={styles.trustGlyph}>✦</Text>
-              <Text style={styles.trustText}>
-                A magical bedtime ritual, lovingly made for Indian families
-              </Text>
-              <Text style={styles.trustGlyph}>✦</Text>
-            </View>
+            <Text style={styles.brandLine}>Gentle bedtime stories from the films we grew up with</Text>
+            <Divider width={140} />
           </Animated.View>
 
-          {/* Age picker — the only step */}
-          <View style={styles.pickerBlock}>
-            <Animated.Text
-              entering={FadeInUp.duration(500).delay(120)}
-              style={styles.headline}
-            >
-              Who's listening{"\n"}tonight?
-            </Animated.Text>
-            <Animated.Text
-              entering={FadeInUp.duration(500).delay(240)}
-              style={styles.body}
-            >
-              Every story is written for their age — simpler words for little ones, richer tales for big kids.
+          <View style={styles.form}>
+            <Animated.Text entering={FadeInUp.duration(500).delay(120)} style={styles.headline}>
+              Who's listening tonight?
             </Animated.Text>
 
-            <Animated.View entering={FadeInUp.duration(500).delay(300)} style={styles.nameWrap}>
+            <Animated.View entering={FadeInUp.duration(500).delay(200)} style={styles.field}>
               <TextInput
                 value={name}
                 onChangeText={setName}
@@ -170,81 +119,47 @@ export default function OnboardingScreen() {
               />
             </Animated.View>
 
-            <View style={styles.ageGrid}>
-              {AGE_RANGES.map((range, i) => {
-                const active = selectedAge === range.key;
-                return (
-                  <Animated.View
-                    key={range.key}
-                    entering={FadeInUp.duration(440).delay(360 + i * 90)}
-                    style={styles.ageCardWrapper}
-                  >
+            <Animated.View entering={FadeInUp.duration(500).delay(280)} style={styles.field}>
+              <Text style={styles.label}>Age</Text>
+              <View style={styles.ageRow} accessibilityRole="radiogroup">
+                {AGE_RANGES.map((range) => {
+                  const active = selectedAge === range.key;
+                  return (
                     <Pressable
+                      key={range.key}
                       onPress={() => setSelectedAge(range.key)}
-                      style={[styles.ageCard, active && styles.ageCardActive]}
+                      style={({ pressed }) => [styles.ageCard, active && styles.ageCardActive, pressed && styles.pressed]}
                       accessibilityRole="radio"
                       accessibilityState={{ checked: active }}
                       accessibilityLabel={`${range.label}. ${range.description}`}
                     >
-                      <Text style={styles.ageEmoji}>{range.emoji}</Text>
-                      <Text style={[styles.ageLabel, active && styles.ageLabelActive]}>
-                        {range.label}
-                      </Text>
-                      <Text style={[styles.ageDesc, active && styles.ageDescActive]}>
-                        {range.description}
-                      </Text>
+                      <Text style={[styles.ageNumber, active && styles.ageNumberActive]}>{range.short}</Text>
+                      <Text style={styles.ageUnit}>years</Text>
+                      <Text style={styles.ageDesc}>{range.description}</Text>
                     </Pressable>
-                  </Animated.View>
-                );
-              })}
-            </View>
+                  );
+                })}
+              </View>
+            </Animated.View>
 
-            <Animated.View entering={FadeInUp.duration(500).delay(640)} style={styles.languageBlock}>
-              <Text style={styles.languageLabel}>Stories in</Text>
+            <Animated.View entering={FadeInUp.duration(500).delay(360)} style={styles.field}>
+              <Text style={styles.label}>Stories in</Text>
               <LanguageSegmented value={language} onChange={setLanguage} />
-              <Text style={styles.languageHint}>
-                {STORY_LANGUAGES.find((l) => l.key === language)?.description}
-              </Text>
+              <Text style={styles.hint}>{STORY_LANGUAGES.find((l) => l.key === language)?.description}</Text>
             </Animated.View>
           </View>
 
-          {/* Primary CTA */}
-          <Animated.View
-            entering={FadeIn.duration(600).delay(500)}
-            style={styles.ctaBlock}
-          >
+          <Animated.View entering={FadeIn.duration(600).delay(450)} style={styles.cta}>
             <Pressable
               onPress={handleComplete}
               disabled={!canFinish}
-              style={({ pressed }) => [
-                styles.primaryBtnWrap,
-                pressed && canFinish && { transform: [{ scale: 0.98 }] },
-                !canFinish && styles.primaryBtnDisabledWrap,
-              ]}
+              style={({ pressed }) => [styles.primaryBtn, !canFinish && styles.primaryBtnDisabled, pressed && canFinish && styles.pressed]}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !canFinish }}
             >
-              <LinearGradient
-                colors={
-                  canFinish
-                    ? [colors.goldLight, colors.gold, colors.orange]
-                    : ["rgba(255,255,255,0.08)", "rgba(255,255,255,0.04)"]
-                }
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.primaryBtn}
-              >
-                <Text
-                  style={[
-                    styles.primaryBtnText,
-                    !canFinish && styles.primaryBtnTextDisabled,
-                  ]}
-                >
-                  Start Listening
-                </Text>
-              </LinearGradient>
+              <Text style={[styles.primaryBtnText, !canFinish && styles.primaryBtnTextDisabled]}>Start listening</Text>
             </Pressable>
-            <Text style={styles.ctaHint}>
-              {canFinish ? "You can add brothers and sisters later." : "Pick an age to continue"}
-            </Text>
+            <Text style={styles.hint}>{canFinish ? "You can add brothers and sisters later." : "Pick an age to continue"}</Text>
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -254,234 +169,74 @@ export default function OnboardingScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  safeArea: { flex: 1 },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    alignItems: "center",
-  },
+  flex: { flex: 1 },
+  scrollContent: { flexGrow: 1, paddingHorizontal: 24, alignItems: "center" },
 
-  // ── Brand header ──────────────────────────────────────────────────────────
-  brandHeader: {
-    alignItems: "center",
-    marginBottom: 28,
-    width: "100%",
-    maxWidth: 500,
-  },
-  brandName: {
-    fontFamily: fonts.heading,
-    fontSize: 26,
-    color: colors.goldLight,
-    marginTop: 8,
-    marginBottom: 12,
-    textAlign: "center",
-  },
+  brand: { alignItems: "center", gap: 10, width: "100%", maxWidth: 460, marginBottom: 28 },
+  moonWrap: { position: "absolute", top: 46, left: 0, right: 0, alignItems: "center" },
+  brandName: { fontFamily: fonts.heading, fontSize: 30, lineHeight: 38, color: colors.cream, marginTop: 14 },
+  brandLine: { fontFamily: fonts.body, fontSize: 15, lineHeight: 21, color: colors.textSecondary, textAlign: "center", maxWidth: 300 },
 
-  // ── Moon cluster ──────────────────────────────────────────────────────────
-  moonCluster: {
-    width: 160,
-    height: 130,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
-  moonHalo: {
-    position: "absolute",
-    width: 200,
-    height: 200,
-  },
-  moon: {
-    fontSize: 76,
-    textAlign: "center",
-  },
-  sparkle: {
-    position: "absolute",
-    fontSize: 16,
-    color: colors.goldLight,
-  },
-  sparkleSmall: {
-    position: "absolute",
-    fontSize: 11,
-    color: colors.goldLight,
-  },
-
-  // ── Trust line ────────────────────────────────────────────────────────────
-  trustRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    paddingHorizontal: 8,
-  },
-  trustGlyph: {
-    fontFamily: fonts.body,
-    fontSize: 11,
-    color: colors.gold,
-    opacity: 0.7,
-  },
-  trustText: {
-    fontFamily: fonts.bodySemiBold,
-    fontSize: 11,
-    letterSpacing: 0.5,
-    color: "rgba(255,255,255,0.55)",
-    textAlign: "center",
-    textTransform: "uppercase",
-    flexShrink: 1,
-  },
-
-  // ── Picker block ──────────────────────────────────────────────────────────
-  pickerBlock: {
-    width: "100%",
-    maxWidth: 500,
-    alignItems: "center",
-  },
-  headline: {
-    fontFamily: fonts.heading,
-    fontSize: 30,
-    lineHeight: 38,
-    color: colors.white,
-    textAlign: "center",
-    marginBottom: 12,
-  },
-  body: {
-    fontFamily: fonts.body,
-    fontSize: 15,
-    lineHeight: 22,
-    color: "rgba(255,255,255,0.78)",
-    textAlign: "center",
-    marginBottom: 20,
-    maxWidth: 380,
-  },
-  nameWrap: {
-    width: "100%",
-    marginBottom: 16,
-  },
-  languageBlock: {
-    width: "100%",
-    marginTop: 20,
-    gap: 8,
-  },
-  languageLabel: {
+  form: { width: "100%", maxWidth: 460, gap: 22 },
+  headline: { fontFamily: fonts.heading, fontSize: 26, lineHeight: 32, color: colors.cream, textAlign: "center" },
+  field: { gap: 10 },
+  label: {
     fontFamily: fonts.bodyBold,
     fontSize: 12,
-    letterSpacing: 1.1,
+    letterSpacing: 1.3,
     textTransform: "uppercase",
     color: colors.textTertiary,
     textAlign: "center",
   },
-  languageHint: {
-    fontFamily: fonts.body,
-    fontSize: 13,
-    color: colors.textTertiary,
-    textAlign: "center",
-  },
+  hint: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18, color: colors.textTertiary, textAlign: "center" },
+
   nameInput: {
-    minHeight: 52,
-    borderRadius: 14,
+    minHeight: 54,
+    borderRadius: 16,
     paddingHorizontal: 18,
-    backgroundColor: "rgba(255,255,255,0.06)",
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: colors.borderGoldMedium,
+    borderColor: colors.line,
     fontFamily: fonts.bodySemiBold,
     fontSize: 17,
-    color: colors.white,
+    color: colors.cream,
     textAlign: "center",
     outlineStyle: "none",
   },
 
-  // ── Age grid ──────────────────────────────────────────────────────────────
-  ageGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 12,
-    width: "100%",
-  },
-  ageCardWrapper: {
-    flexBasis: "47%",
-    flexGrow: 1,
-    maxWidth: 230,
-  },
+  ageRow: { flexDirection: "row", gap: 10 },
   ageCard: {
-    backgroundColor: "rgba(255,255,255,0.05)",
-    borderRadius: 16,
+    flex: 1,
+    minHeight: 128,
+    paddingTop: 22,
+    paddingBottom: 16,
+    paddingHorizontal: 8,
+    borderRadius: 18,
+    borderTopLeftRadius: 44,
+    borderTopRightRadius: 44,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: colors.borderGoldSubtle,
-    padding: 18,
-    alignItems: "center",
-    gap: 6,
-    minHeight: 140,
-    justifyContent: "center",
+    borderColor: colors.lineSoft,
   },
-  ageCardActive: {
-    backgroundColor: "rgba(246,166,35,0.14)",
-    borderColor: colors.gold,
-  },
-  ageEmoji: {
-    fontSize: 32,
-  },
-  ageLabel: {
-    fontFamily: fonts.heading,
-    fontSize: 17,
-    color: colors.white,
-    textAlign: "center",
-  },
-  ageLabelActive: {
-    color: colors.goldLight,
-  },
-  ageDesc: {
-    fontFamily: fonts.body,
-    fontSize: 12,
-    color: "rgba(255,255,255,0.55)",
-    textAlign: "center",
-    lineHeight: 16,
-  },
-  ageDescActive: {
-    color: "rgba(255,255,255,0.78)",
-  },
+  ageCardActive: { borderColor: colors.marigold, backgroundColor: "rgba(245,165,36,0.12)" },
+  ageNumber: { fontFamily: fonts.heading, fontSize: 26, lineHeight: 32, color: colors.cream },
+  ageNumberActive: { color: colors.marigoldSoft },
+  ageUnit: { fontFamily: fonts.bodySemiBold, fontSize: 12, color: colors.textTertiary, marginTop: -2 },
+  ageDesc: { fontFamily: fonts.body, fontSize: 12, lineHeight: 16, color: colors.textSecondary, textAlign: "center", marginTop: 8 },
 
-  // ── CTA block ─────────────────────────────────────────────────────────────
-  ctaBlock: {
-    width: "100%",
-    maxWidth: 420,
-    marginTop: 32,
-    alignItems: "center",
-  },
-  primaryBtnWrap: {
-    width: "100%",
-    borderRadius: 30,
-    overflow: "hidden",
-    shadowColor: colors.gold,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  primaryBtnDisabledWrap: {
-    shadowOpacity: 0,
-    elevation: 0,
-  },
+  cta: { width: "100%", maxWidth: 420, marginTop: 30, gap: 12, alignItems: "center" },
   primaryBtn: {
-    paddingVertical: 16,
-    paddingHorizontal: 32,
+    width: "100%",
+    minHeight: 56,
+    borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 30,
+    backgroundColor: colors.marigold,
   },
-  primaryBtnText: {
-    fontFamily: fonts.heading,
-    fontSize: 17,
-    color: "#1a0a00",
-    letterSpacing: 0.3,
-  },
-  primaryBtnTextDisabled: {
-    color: "rgba(255,255,255,0.35)",
-  },
-  ctaHint: {
-    fontFamily: fonts.body,
-    fontSize: 12,
-    color: "rgba(255,255,255,0.45)",
-    marginTop: 12,
-    textAlign: "center",
-  },
+  primaryBtnDisabled: { backgroundColor: colors.chip, borderWidth: 1, borderColor: colors.chipBorder },
+  primaryBtnText: { fontFamily: fonts.heading, fontSize: 18, color: colors.onGold },
+  primaryBtnTextDisabled: { color: colors.textTertiary },
+  pressed: { opacity: 0.9, transform: [{ scale: 0.98 }] },
 });

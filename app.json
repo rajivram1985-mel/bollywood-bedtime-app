@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0a0620"
+      "backgroundColor": "#0D0C26"
     },
     "ios": {
       "supportsTablet": true,
@@ -26,7 +26,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#1a1040"
+        "backgroundColor": "#1A1A4D"
       },
       "edgeToEdgeEnabled": true,
       "blockedPermissions": [
@@ -38,8 +38,8 @@
       "shortName": "Bedtime",
       "description": "Gentle bedtime stories inspired by much-loved Bollywood films, written for your child's age.",
       "favicon": "./assets/favicon.png",
-      "themeColor": "#0a0620",
-      "backgroundColor": "#0a0620"
+      "themeColor": "#0D0C26",
+      "backgroundColor": "#0D0C26"
     },
     "plugins": [
       "expo-font",
@@ -49,7 +49,7 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 180,
           "resizeMode": "contain",
-          "backgroundColor": "#0a0620"
+          "backgroundColor": "#0D0C26"
         }
       ],
       [

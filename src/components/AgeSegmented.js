@@ -30,7 +30,9 @@ export default function AgeSegmented({ value, onChange, accessibilityLabel = "Ag
 const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
-    backgroundColor: "rgba(255,255,255,0.06)",
+    backgroundColor: colors.night800,
+    borderWidth: 1,
+    borderColor: colors.lineSoft,
     borderRadius: 12,
     padding: 3,
     gap: 3,

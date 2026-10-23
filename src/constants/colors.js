@@ -1,68 +1,60 @@
+// "Jharokha nights" palette.
+//
+// Indigo night (neel) for surfaces, marigold (genda) for anything you tap,
+// warm cream for text instead of pure white (gentler on eyes in a dark room),
+// and a little rose for warmth. Solid colours over glowing gradients — the
+// app is used in the dark, at the end of the day.
+
+const palette = {
+  night900: "#08071C",
+  night800: "#0D0C26",
+  night700: "#131337",
+  night600: "#1A1A47",
+  night500: "#23235A",
+  marigold: "#F5A524",
+  marigoldSoft: "#FFCF7D",
+  saffron: "#E9782F",
+  cream: "#FFF3DE",
+  rose: "#F2A7B8",
+  ink: "#1C1004",
+};
+
 export const colors = {
-  // Background gradient stops
-  bgTop: "#0a0620",
-  bgMid1: "#150d30",
-  bgMid2: "#1a1040",
-  bgBottom: "#0d0820",
+  ...palette,
 
-  // Accent / gold
-  gold: "#F6A623",
-  goldLight: "#FCD89D",
-  orange: "#E8783A",
+  // Background gradient stops (top → bottom)
+  bgTop: "#100F30",
+  bgMid1: "#131439",
+  bgMid2: "#111234",
+  bgBottom: palette.night800,
 
-  // Purple accents
-  purple: "#8B5CF6",
-  purpleDark: "#6D28D9",
+  // Surfaces — opaque, so stacked cards never go muddy
+  card: palette.night700,
+  cardRaised: palette.night600,
+  chip: "rgba(255, 243, 222, 0.07)",
+  chipBorder: "rgba(255, 243, 222, 0.10)",
 
-  // Panels
-  panelBg: "rgba(30, 20, 50, 0.7)",
-  panelBgSolid: "#1e1245",
-  panelBgDark: "#120e25",
-  savedPanelTop: "#1a1035",
-  savedPanelBottom: "#0d0a1a",
+  // Lines
+  line: "rgba(255, 207, 125, 0.22)",
+  lineSoft: "rgba(255, 243, 222, 0.08)",
+  frameInset: "rgba(255, 207, 125, 0.38)",
 
-  // Borders
-  borderGold: "rgba(255, 200, 100, 0.15)",
-  borderGoldSubtle: "rgba(255, 200, 100, 0.1)",
-  borderGoldFaint: "rgba(255, 200, 100, 0.06)",
-  borderGoldMedium: "rgba(255, 200, 100, 0.2)",
-
-  // Text — tertiary stays ≥ 4.5:1 on the darkest background (WCAG AA)
-  white: "#FFFFFF",
-  textPrimary: "rgba(255, 255, 255, 0.88)",
-  textSecondary: "rgba(255, 255, 255, 0.72)",
-  textTertiary: "rgba(255, 255, 255, 0.6)",
-  onGold: "#1a0a00",
-  textMuted: "rgba(255, 255, 255, 0.18)",
-  textSubtle: "rgba(255, 255, 255, 0.3)",
-
-  // Surfaces
-  surfaceLight: "rgba(255, 255, 255, 0.06)",
-  surfaceHover: "rgba(255, 255, 255, 0.12)",
-  surfaceFaint: "rgba(255, 255, 255, 0.05)",
-  surfaceVeryFaint: "rgba(255, 255, 255, 0.03)",
-  surfaceInput: "rgba(255, 255, 255, 0.05)",
-  surfaceBorder: "rgba(255, 255, 255, 0.08)",
-  surfaceOverlay: "rgba(0, 0, 0, 0.6)",
-  surfaceOverlayDark: "rgba(0, 0, 0, 0.7)",
+  // Text (cream on night800: primary ≈ 15:1, tertiary ≈ 6.5:1)
+  textPrimary: "rgba(255, 243, 222, 0.94)",
+  textSecondary: "rgba(255, 243, 222, 0.74)",
+  textTertiary: "rgba(255, 243, 222, 0.6)",
+  onGold: palette.ink,
 
   // States
-  error: "#ff9999",
-  errorBg: "rgba(255, 80, 80, 0.1)",
-  errorBorder: "rgba(255, 80, 80, 0.2)",
-  deleteBg: "rgba(255, 80, 80, 0.15)",
-  deleteBorder: "rgba(255, 80, 80, 0.2)",
-  deleteText: "#ff6b6b",
+  error: "#FFB4A3",
 
-  // Info banner
-  infoBg: "rgba(246, 166, 35, 0.08)",
-  infoBorder: "rgba(246, 166, 35, 0.2)",
-
-  // Save button
-  saveBg: "rgba(246, 166, 35, 0.12)",
-  saveBorder: "rgba(246, 166, 35, 0.25)",
-  savedText: "rgba(246, 166, 35, 0.6)",
-
-  // Selected voice
-  voiceSelectedBg: "rgba(246, 166, 35, 0.12)",
+  // Legacy names (older components) mapped onto the new palette
+  gold: palette.marigold,
+  goldLight: palette.marigoldSoft,
+  orange: palette.saffron,
+  white: palette.cream,
+  borderGold: "rgba(255, 207, 125, 0.22)",
+  borderGoldSubtle: "rgba(255, 207, 125, 0.14)",
+  borderGoldFaint: "rgba(255, 207, 125, 0.08)",
+  borderGoldMedium: "rgba(255, 207, 125, 0.28)",
 };

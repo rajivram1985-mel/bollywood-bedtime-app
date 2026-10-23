@@ -1,33 +1,29 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import ArchFrame from "./ArchFrame";
 import StoryArt from "./StoryArt";
 import { CloseIcon } from "./Icons";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
-export const CARD_WIDTH = 148;
+export const CARD_WIDTH = 140;
 
+// A story on the shelf: the artwork in an arched window, the title beneath.
 export default function StoryCard({ story, onPress, onDelete, width = CARD_WIDTH }) {
   return (
     <View style={{ width }}>
       <Pressable
         onPress={() => onPress(story)}
-        style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+        style={({ pressed }) => [styles.press, pressed && styles.pressed]}
         accessibilityRole="button"
         accessibilityLabel={`Play ${story.title}, ${story.minutes} minutes`}
       >
-        <StoryArt story={story} />
-        <LinearGradient
-          colors={["transparent", "rgba(5,2,15,0.6)", "rgba(5,2,15,0.97)"]}
-          locations={[0.35, 0.65, 1]}
-          style={StyleSheet.absoluteFill}
-        />
-        <View style={styles.meta}>
-          <Text style={styles.title} numberOfLines={2}>
-            {story.title}
-          </Text>
-          <Text style={styles.sub}>{story.minutes} min</Text>
-        </View>
+        <ArchFrame width={width} style={{ height: width * 1.36 }} inset={5} bottomRadius={14}>
+          <StoryArt story={story} emojiSize={36} />
+        </ArchFrame>
+        <Text style={styles.title} numberOfLines={2}>
+          {story.title}
+        </Text>
+        <Text style={styles.sub}>{story.minutes} min</Text>
       </Pressable>
       {onDelete ? (
         <Pressable
@@ -37,7 +33,7 @@ export default function StoryCard({ story, onPress, onDelete, width = CARD_WIDTH
           accessibilityRole="button"
           accessibilityLabel={`Delete ${story.title}`}
         >
-          <CloseIcon size={12} color="rgba(255,255,255,0.9)" />
+          <CloseIcon size={12} color={colors.cream} />
         </Pressable>
       ) : null}
     </View>
@@ -45,45 +41,35 @@ export default function StoryCard({ story, onPress, onDelete, width = CARD_WIDTH
 }
 
 const styles = StyleSheet.create({
-  card: {
-    width: "100%",
-    aspectRatio: 2 / 3,
-    borderRadius: 16,
-    overflow: "hidden",
-    backgroundColor: "rgba(20,10,40,0.6)",
-    borderWidth: 1,
-    borderColor: colors.borderGoldSubtle,
-  },
-  pressed: {
-    opacity: 0.8,
-    transform: [{ scale: 0.98 }],
-  },
-  meta: {
-    position: "absolute",
-    left: 12,
-    right: 12,
-    bottom: 12,
+  press: {
     gap: 2,
   },
+  pressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
+  },
   title: {
-    fontFamily: fonts.heading,
+    fontFamily: fonts.headingMedium,
     fontSize: 15,
     lineHeight: 19,
-    color: colors.white,
+    color: colors.textPrimary,
+    marginTop: 8,
+    paddingHorizontal: 2,
   },
   sub: {
     fontFamily: fonts.bodySemiBold,
     fontSize: 12,
-    color: colors.textSecondary,
+    color: colors.textTertiary,
+    paddingHorizontal: 2,
   },
   delete: {
     position: "absolute",
-    top: 8,
-    right: 8,
+    top: 10,
+    right: 10,
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: "rgba(8,7,28,0.75)",
     alignItems: "center",
     justifyContent: "center",
   },

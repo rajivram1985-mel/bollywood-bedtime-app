@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Image, StyleSheet, Text } from "react-native";
+import { Image, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { MoonIcon } from "./Icons";
+import { colors } from "../constants/colors";
 
 // Artwork for a story: bundled illustration → remote poster → gradient + emoji.
 // Explicit 100% width/height matters on web: react-native-web otherwise sizes
@@ -21,8 +23,8 @@ export default function StoryArt({ story, style, emojiSize = 44 }) {
     );
   }
   return (
-    <LinearGradient colors={["#4b2a7a", "#1a0f38"]} style={[styles.fill, styles.fallback, style]}>
-      <Text style={{ fontSize: emojiSize }}>🌙</Text>
+    <LinearGradient colors={[colors.night500, colors.night800]} style={[styles.fill, styles.fallback, style]}>
+      <MoonIcon size={emojiSize} color={colors.marigoldSoft} />
     </LinearGradient>
   );
 }
