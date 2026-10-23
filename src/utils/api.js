@@ -10,6 +10,13 @@ const IS_WEB = Platform.OS === "web";
 
 export const canGenerateStories = IS_WEB || !!API_BASE;
 
+// Absolute URL for a page on the deployed site (privacy policy etc.), or null
+// on native builds that have no site configured.
+export function siteUrl(path) {
+  if (IS_WEB) return path;
+  return API_BASE ? `${API_BASE}${path}` : null;
+}
+
 // React Native's built-in fetch has no streaming body; expo/fetch does.
 const streamingFetch = IS_WEB ? (...args) => globalThis.fetch(...args) : expoFetch;
 

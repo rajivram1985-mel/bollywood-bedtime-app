@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, TextInput, Pressable, ScrollView, Modal, StyleSheet } from "react-native";
+import { View, Text, TextInput, Pressable, ScrollView, Modal, StyleSheet, Linking } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import appConfig from "../../app.json";
 
@@ -8,6 +8,7 @@ import LanguageSegmented from "../components/LanguageSegmented";
 import KidAvatar from "../components/KidAvatar";
 import { CloseIcon, PlusIcon } from "../components/Icons";
 import { useProfiles } from "../state/ProfileContext";
+import { siteUrl } from "../utils/api";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
@@ -133,6 +134,15 @@ export default function SettingsSheet({ visible, onClose }) {
               scary villains, no violence, and every story ends sleepy. We're not affiliated with the films or
               their studios.
             </Text>
+            <Text style={styles.about}>
+              Your children's names and ages stay on this device. There are no accounts, ads or tracking.
+            </Text>
+            {siteUrl("/privacy.html") ? (
+              <Pressable onPress={() => Linking.openURL(siteUrl("/privacy.html"))} style={styles.linkBtn} accessibilityRole="link">
+                <Text style={styles.linkText}>Privacy policy</Text>
+              </Pressable>
+            ) : null}
+            <Text style={styles.credit}>Film posters for stories you make come from TMDB. This product uses the TMDB API but is not endorsed or certified by TMDB.</Text>
             <Text style={styles.version}>Version {appConfig.expo.version}</Text>
           </ScrollView>
         </View>
@@ -207,5 +217,8 @@ const styles = StyleSheet.create({
   countTextActive: { color: colors.onGold },
 
   about: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.textSecondary },
+  linkBtn: { minHeight: 40, justifyContent: "center", alignSelf: "flex-start", marginTop: 4 },
+  linkText: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.gold },
+  credit: { fontFamily: fonts.body, fontSize: 12, lineHeight: 17, color: colors.textTertiary, marginTop: 6 },
   version: { fontFamily: fonts.body, fontSize: 12, color: colors.textTertiary, marginTop: 10 },
 });
