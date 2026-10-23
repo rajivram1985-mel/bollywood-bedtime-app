@@ -71,3 +71,10 @@ The function validates the title against a plain-title character class (no quote
 ### Web gotcha: images
 
 React Native Web sizes a `require()`d image to its intrinsic pixels unless the style sets width/height explicitly — `absoluteFill` alone isn't enough. Use [StoryArt](src/components/StoryArt.js), which sets `width/height: "100%"`.
+
+### Design system ("Jharokha nights")
+
+- **Motif:** story artwork always sits in [ArchFrame](src/components/ArchFrame.js) — an arched palace window (radius = half the width) with a thin marigold inset border. Pass `width` when known; otherwise it measures itself. Section marks come from [Ornament](src/components/Ornament.js) (`Phool`, `Divider`).
+- **Palette** ([src/constants/colors.js](src/constants/colors.js)): indigo `night*` surfaces, solid `marigold` for anything tappable (no gradient buttons), `cream` text instead of pure white, opaque `card`/`cardRaised` surfaces. Older names (`gold`, `goldLight`, `white`…) are aliases onto the new palette.
+- **Type:** Baloo 2 for headings (it has matching Devanagari, Tamil, Bengali and Telugu families for future languages), Nunito for body. Hindi read-along falls back to the system Devanagari font.
+- **No emoji in UI chrome** — draw icons in [Icons.js](src/components/Icons.js) so every platform looks the same.
