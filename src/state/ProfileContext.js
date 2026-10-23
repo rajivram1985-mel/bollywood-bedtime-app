@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { getData, getJSON, setJSON, setData, STORAGE_KEYS } from "../utils/storage";
 import { AGE_KEYS, DEFAULT_AGE } from "../constants/ageRanges";
+import { LANGUAGE_KEYS, DEFAULT_LANGUAGE } from "../constants/languages";
 
 // Family profiles (kids), bedtime preferences and per-child listening history.
 // Everything is local to the device — no account needed.
@@ -24,6 +25,8 @@ async function loadInitialState() {
     kids = done ? [{ id: newId(), name: "", ageRange: AGE_KEYS.includes(legacyAge) ? legacyAge : DEFAULT_AGE }] : [];
     if (kids.length) await setJSON(STORAGE_KEYS.KIDS, kids);
   }
+  // Profiles saved before story languages existed default to English.
+  kids = kids.map((k) => ({ ...k, language: LANGUAGE_KEYS.includes(k.language) ? k.language : DEFAULT_LANGUAGE }));
 
   const [activeId, prefs, history] = await Promise.all([
     getData(STORAGE_KEYS.ACTIVE_KID),
@@ -57,8 +60,8 @@ export function ProfileProvider({ children }) {
   }, []);
 
   const addKid = useCallback(
-    ({ name = "", ageRange = DEFAULT_AGE } = {}) => {
-      const kid = { id: newId(), name: name.trim(), ageRange };
+    ({ name = "", ageRange = DEFAULT_AGE, language = DEFAULT_LANGUAGE } = {}) => {
+      const kid = { id: newId(), name: name.trim(), ageRange, language };
       saveKids((kids) => [...kids, kid]);
       return kid.id;
     },

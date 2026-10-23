@@ -1,8 +1,8 @@
-export async function generateStory(movieName, ageRange = "6-8") {
+export async function generateStory(movieName, ageRange = "6-8", language = "en") {
   const res = await fetch("/.netlify/functions/generate-story", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ movieName, ageRange }),
+    body: JSON.stringify({ movieName, ageRange, language }),
   });
   if (!res.ok) {
     const errData = await res.json().catch(() => ({}));

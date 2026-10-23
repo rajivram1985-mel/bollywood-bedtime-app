@@ -1,0 +1,553 @@
+# Review: English with Hindi words stories, ages 3-5
+
+Read each story and note anything to change — reply with the film name and what's wrong (or "approved").
+Narration won't be generated until these are approved.
+
+**What to look for**
+
+- [ ] The Hindi words are ones families really use with little kids, spelled the usual way in Roman letters
+- [ ] Each Hindi word's meaning is clear the first time it appears
+- [ ] Not too many Hindi words — it should still be an easy English story
+- [ ] Nothing scary, violent or romantic; ends sleepily
+
+---
+
+## DDLJ
+
+_942 words · 5,057 characters_
+
+Okay little one, snuggle up tight. Pull that blanket all the way up to your chin. That's it. Are you cozy? Good. Because tonight I'm going to tell you about a very, very fun adventure. An adventure with two best friends, a silly grumpy papa, a long train ride, and the biggest, most beautiful wedding you ever saw in your whole life. Ready? Here we go.
+
+Once upon a time, in a big and busy city called London, there lived a boy named Raj. Raj was the happiest, silliest, most cheerful boy you can imagine. He laughed at everything. He danced in the rain. He ate too many samosas. His papa would shake his head and say, "Oh Raj, Raj, Raj." But he always said it with a little smile, because really, everyone loved Raj.
+
+Now in that same city, there was a girl named Simran. Simran had the most beautiful laugh. She loved to spin around in the sunshine and dream about faraway places. She lived with her papa, her mama, and her sweet little family. Her papa loved her so, so much. But her papa was also, well... a little bit grumpy. Not scary grumpy. More like a grumpy teddy bear grumpy. You know the kind? Big puffed-up chest, loud voice, but really just a big softie inside. Yes, that kind of papa.
+
+Simran's papa had a very old dost, a very old friend, all the way back in India. And this old friend had a son. And the papa had decided, a long long time ago, that one day Simran would go to India and marry that son. That was the plan. Simran felt a little bit sad about the plan because she hadn't even met this boy. But she loved her papa so much that she said, accha, okay papa, okay.
+
+But before the plan happened, Simran got to go on one last big trip. A holiday! Across Europe! On trains and buses, through mountains and fields of yellow flowers. Bahut sundar. So, so beautiful.
+
+And guess who was also on that very same trip? You guessed it. Raj! Oh, and right away, Raj and Simran started bickering and teasing each other like you wouldn't believe. Raj was being silly. Simran was rolling her eyes. But slowly, slowly, doing all the fun things that best friends do — laughing at pigeons, sharing snacks, getting lost and finding their way back — they became the most wonderful dosts. The most wonderful friends.
+
+By the end of the trip, they were bahut khush, so very happy together. Raj knew that Simran was his very best friend in the whole world. And Simran felt it too, right in her heart, like a warm little glowing light.
+
+But then — oh no — it was time to go home. And Simran's papa said, "Beta, my darling girl, we are going to India. We are going to the wedding. That is that." And off they went on an airplane, all the way to India, to a big beautiful farm called Punjab, where Simran's papa's old dost lived with his whole big noisy family.
+
+Now Raj could have just said goodbye and stayed in London. But could he? Could he really? No no no! Because a real friend doesn't just wave goodbye! So Raj got on a train to India too. Chalo, let's go, he said to himself, and off he went!
+
+He found Simran's family's farm. And you know what he did? He didn't cause any trouble. He didn't shout or make a fuss. He was very clever. He made friends with everybody. He helped in the kitchen. He played with the little kids. He fixed things that were broken. The grandmas — the dadi and the nani — they absolutely adored him. "What a good boy!" they kept saying, patting his cheeks.
+
+But the boy Simran was supposed to marry — his name was Baldev — oh, Baldev was very funny indeed. He tripped over things. He bumped into doors. He once sat on a plate of laddoos by accident. He was not a bad boy, just very very clumsy and a little bit too full of himself. His helpers were even sillier. They bumped into each other constantly. It was like watching puppies try to climb stairs.
+
+And Simran's grumpy-teddy-bear papa? He kept looking at Raj suspiciously. Squinting his eyes. Going hmmm. But every single time something needed doing, it was Raj who helped. Quietly, kindly, without being asked.
+
+Slowly, slowly, even the grumpy papa started to see. He saw how his daughter smiled. A real smile. A big, bright, from-the-tummy smile. And he remembered what it felt like to be young and happy and full of sunshine.
+
+And one beautiful golden evening, with the mustard flowers swaying and the chanda mama, the moon, rising big and round in the sky, Simran's papa looked at Raj for a long long time. And then — oh, this is the best part, little one — he opened his arms. He said go, beta, go. Go be happy.
+
+Raj ran. Simran ran. They caught up with each other, laughing and laughing, and off they went together into their wonderful new adventure, the best of friends, the very best of friends in the whole wide world.
+
+And the dadi and the nani danced. The whole farm danced. Even Baldev danced, and only tripped twice.
+
+So jao now, little one. Close those sleepy eyes. Everyone is happy. Everyone is safe. The moon is watching over you just like chanda mama always does. Breathe in slow... breathe out slow...
+
+You are loved, beta. So, so loved.
+
+Goodnight.
+
+---
+
+## Sholay
+
+_956 words · 5,197 characters_
+
+Okay little one, snuggle up tight. Pull that blanket all the way up to your chin. That's it. Are you cozy? Good. Because tonight I'm going to tell you a very special story. A story about two best friends, a kind old man, and the silliest, most bumbling bad guy you ever did hear about.
+
+Ready? Here we go.
+
+Once upon a time, in a little village called Ramgarh, there lived a very kind man named Thakur. Now Thakur was like the grandfather of the whole village. Everybody loved him. He had a big white moustache and twinkling eyes and he always knew exactly what to do. His ghar, his home, sat right at the top of a little hill, and from his window he could see all the golden fields and all the happy people of Ramgarh.
+
+But here's the thing, beta. The village had a tiny problem. A very silly problem.
+
+There was a man called Gabbar who lived out in the rocky hills nearby. Now Gabbar thought he was very scary. He wore a big dusty hat and he practiced his mean face in the mirror every single morning. He'd go, "Hmmm, am I scary? Yes, I think I'm very scary." But honestly? He really wasn't. His boots were too big for his feet and he kept tripping over them. His gang of friends were just as silly. One of them sneezed every time he tried to shout. Another one always forgot what he was supposed to be doing and just wandered off looking at butterflies.
+
+Gabbar and his silly gang would come into the village and demand all the food and all the sweets. And the village people were tired of it. Very, very tired.
+
+So Thakur had a brilliant idea.
+
+He thought of two young men he knew. Two dosts, two very best friends, named Jai and Veeru.
+
+Oh, Jai and Veeru. They were something special, beta. Jai was quiet and clever. He thought before he spoke. He always had a little smile like he knew a secret. And Veeru! Veeru was loud and bouncy and full of jokes. He laughed so big that birds flew off the trees when he laughed. Together, they were the best team you could ever imagine. Where one was quiet, the other was loud. Where one was careful, the other was brave. They were like chai and biscuit. Just better together.
+
+Thakur found them and said, "Come to my village. Help us. Ramgarh needs you."
+
+And Jai and Veeru looked at each other. And then they smiled. And they said, "Chalo. Let's go."
+
+So off they went to Ramgarh.
+
+When they arrived, oh, the whole village came out to see them! There was a young woman named Basanti who could talk faster than a train going downhill. She had a little horse cart and she went clip clop clip clop all over the village. She became a wonderful dost, a really good friend, to both of them. And there was Radha, Thakur's gentle daughter-in-law, who was quiet and kind and made the most wonderful rotis you've ever smelled.
+
+Jai and Veeru settled right in. They helped fix things. They made people laugh. The children of the village followed them everywhere going, "Jai bhaiya! Veeru bhaiya!" And the whole village felt warmer. Bahut khush. Everyone was so very happy.
+
+But then, of course, came silly old Gabbar.
+
+He came stomping into the village one afternoon, tripping over his too-big boots, his hat falling over his eyes. He pointed a wobbly finger and said, "I am Gabbar! Fear me!"
+
+And do you know what Jai did? Jai sat down very calmly and thought. And then he whispered his plan to Veeru.
+
+Veeru grinned that big grin of his.
+
+They set up the most wonderful, most ridiculous trap you can imagine. They put a trail of laddoos, those big round sweet laddoos, leading all the way through the village. And Gabbar, who absolutely could not resist laddoos, followed that trail. Chomp chomp chomp. All the way into the village square.
+
+And then — whoooosh — a big net fell right on top of Gabbar and his whole silly gang. All tangled up. Gabbar's hat fell over his face. His friends were spinning around bumping into each other. One of them sneezed so hard he sat right down on the ground. The butterflies-watcher was still looking at a butterfly and didn't even notice.
+
+The whole village burst out laughing. Even Thakur laughed so hard his big white moustache wiggled.
+
+Gabbar looked up from under his hat and said, in a very small voice, "This is not how I planned today."
+
+And that was that. Gabbar promised, very sincerely, to stop being a bother. He was sent far, far away to think about his choices. And do you know, he later opened a small sweet shop. And he was actually quite good at it.
+
+Ramgarh was free. The village danced and sang and cooked enormous pots of food and everyone ate together under the stars.
+
+Thakur put his hand on Jai and Veeru's shoulders and said, "Shabash. Well done, my boys. Bahut shabash."
+
+And Jai and Veeru just smiled at each other. Because that's what dosts do. They show up. They help. They make things better.
+
+That night, everyone in Ramgarh slept so peacefully. The chanda mama, the dear old moon, floated up in the sky and looked down at the quiet little village all snuggled and safe.
+
+And now, beta, it's time for you to sleep just like them. Accha? Nice and cozy. Close those eyes. The moon is watching over you too, just like chanda mama watched over Ramgarh.
+
+So jao, my little one. So jao. Sweet dreams.
+
+---
+
+## 3 Idiots
+
+_921 words · 5,276 characters_
+
+Okay little one, snuggle up tight. Pull that blanket all the way to your chin. Yes, just like that. Are you cozy? Good. Because I have the most wonderful story to tell you tonight. It's about three best friends, and how one of them taught everyone something very, very important. Ready? Here we go.
+
+Once upon a time, in a big, busy school that sat on top of a green hill, there were three best friends. Their names were Rancho, Farhan, and Raju. These three dost, these very best friends, did everything together. They ate together. They laughed together. And every night, they fell asleep in the same little room in their school dormitory, snoring away like three happy bears.
+
+Now, this school was called Imperial College of Engineering. It was a very grand school with very tall gates and very long, serious-looking hallways. And it had a director. His name was Virus. Director Virus had a very funny, very wiggly moustache. And he walked around with his chest puffed out, like a little pigeon who thought he was a peacock. He was not mean, not really. But he was very, very serious. Too serious. He thought school should only be about memorizing big, big words and winning trophies. He had a trophy room and oh, he loved that trophy room bahut zyada, so very much.
+
+Director Virus believed that learning was only about getting the best marks. The best marks, always the best marks. That was the only thing that mattered to him. He would waddle down the hallways going, marks marks marks, like a little duck who only knew one word.
+
+But Rancho, oh, our Rancho was different.
+
+Rancho had bright, sparkling eyes and a smile that made everyone around him feel warm, like sitting next to a fire on a cold night. Rancho did not just want to memorize words from books. Rancho wanted to understand things. Really understand them. How do machines work? Why does lightning flash? How do birds fly? These were the questions that made his heart sing.
+
+And whenever things got hard, whenever Farhan or Raju felt scared or sad, Rancho would hold their hand and say, "Aal izz well." That means, everything is going to be okay. Everything is going to be okay, beta. Rancho said it so softly, so warmly, that even your heart would feel better just hearing it.
+
+Now, Farhan had a secret. He loved taking pictures of animals and birds. He wanted to be a wildlife photographer more than anything in the whole wide world. But his papa had always dreamed of Farhan becoming an engineer. So Farhan came to the big school on the hill, even though his heart was somewhere else, somewhere out in the jungle with the animals.
+
+And Raju, sweet, gentle Raju, had a family at home who needed him to do well. He was so scared of failing that he could hardly sleep at night. He would shake and worry and clutch his books so hard his knuckles went white.
+
+But Rancho kept saying, "Aal izz well, dost. Aal izz well."
+
+One day, Director Virus decided to give everyone a very, very hard test. The hardest test ever. He puffed up his chest, smoothed his wiggly moustache, and said, "This test will show who is truly the best!" He thought it would make Rancho scared. But chalo, let me tell you what Rancho did.
+
+Instead of just memorizing answers, Rancho actually thought about them. He used his big, curious, wonderful brain. And while everyone else wrote out big complicated words they didn't understand at all, Rancho wrote about how things actually worked. Simply. Clearly. Beautifully.
+
+Director Virus scratched his head. His moustache wiggled. He didn't quite know what to do with that.
+
+Over time, something magical started happening. Farhan found the courage to tell his papa about his dream. And you know what, beta? His papa, when he really listened, when he really heard his son's heart, he said accha, okay, let's try. And Farhan's face lit up like diwali.
+
+And Raju, brave Raju, stopped being so scared. He started believing in himself, just a little bit at first, then more and more every day. Shabash, Raju, shabash. Well done, well done.
+
+And Director Virus, with his wiggly moustache and his pigeon chest, even he slowly, slowly started to understand. Learning was not just about marks. Learning was about loving what you do. About being curious. About asking questions. His moustache still wiggled, but a little more gently now. And sometimes, just sometimes, you could see the teeniest tiniest smile hiding under it.
+
+Years went by. The three dost finished school and went out into the big wide world. Farhan became a wonderful wildlife photographer. Raju became a kind and clever engineer. And Rancho? Rancho went to live in a beautiful, peaceful valley near the mountains, where he opened a little school of his own. A school where children laughed and wondered and asked all the questions they wanted.
+
+And somewhere, far away, in a little school on a hill, a wiggly moustache smiled and remembered.
+
+Now, my little one, can you feel your eyes getting heavy? That's good. That's very good. Close them slowly. Just like Rancho, you have a curious, wonderful brain inside that beautiful head of yours. And whatever you dream about tonight, whatever makes your heart sing, that is your treasure. That is yours to keep.
+
+Aal izz well, beta. Aal izz well.
+
+So jao now. Sleep, my love. Sleep.
+
+---
+
+## Kuch Kuch Hota Hai
+
+_969 words · 5,365 characters_
+
+Okay little one, snuggle up tight. Pull that blanket all the way up to your chin. Yes, just like that. Are you comfy? Good. Because tonight I'm going to tell you the most magical story about friendship, and love, and finding the people who make your heart feel like it's doing little happy jumps.
+
+Ready? Here we go.
+
+Once upon a time, in a big, bright, beautiful college full of laughing and music and colour, there lived a boy named Rahul. Rahul had the biggest smile you ever saw. Like, the kind of smile that made everyone around him smile too, even if they were having a grumpy day. And Rahul had a dost, his very best friend in the whole wide world. That dost was a girl named Anjali.
+
+Now Anjali was something special, beta. She wore sporty clothes and ran faster than almost everyone and laughed so loud you could hear her from three classrooms away. She and Rahul did everything together. They played basketball together. They got into silly trouble together. They shared their tiffin together. Every single day.
+
+Rahul and Anjali were the best best best friends. And everyone at college knew it.
+
+But then, one day, something happened. A new girl came to their college. Her name was Tina. Tina was kind and gentle and she had the softest voice, like she was always almost singing. And Rahul, well, Rahul's heart started doing those little happy jumps every time he saw Tina.
+
+He liked Tina. He really, really liked her.
+
+Now poor Anjali, she saw this happening, and her heart felt a little bit... quiet. A little bit sad. Because she had started to realise that Rahul was her most favourite person in the world. Not just her dost. But her most favourite. And now Rahul's most favourite was someone new.
+
+But here's the thing about Anjali, beta. She was bahut brave. Bahut brave means very, very brave. And even though her heart was quiet and sad, she wanted Rahul to be happy. Because that's what real friends do. They want good things for the people they love, even when it's hard.
+
+So Anjali smiled her big loud smile and she helped Rahul. And Rahul and Tina became the best of friends, and then even more than friends.
+
+And then, because life can be both happy and sad at the very same time, Tina got sick. And even though everyone loved her so much and held her hand and stayed by her side, Tina had to go away to live up in the stars. Up where chanda mama, the moon uncle, keeps all the brightest and kindest souls safe and glowing.
+
+Before she went, Tina left something behind. Something tiny and perfect and wonderful. A little baby girl named Anjali. She named her baby after her most favourite person. After Rahul's best dost. Because Tina had a big, kind heart like that.
+
+And little Anjali grew up with her papa Rahul, and she was curious and funny and full of questions. And every year on her birthday, Rahul would give her a letter. A letter that Tina had written for her before she went to live with chanda mama. Letters full of love and stories and one very important thing.
+
+Tina wanted little Anjali to find her papa a new best friend. Someone who would make his heart do those happy jumps again.
+
+So little Anjali, clever and determined and bahut brave just like her namesake, made a plan.
+
+And that plan led them to a summer camp. A big, joyful, noisy summer camp full of children and games and songs and dal chawal at dinner time. And at that camp, little Anjali met someone. A grown-up someone. A woman named Anjali.
+
+The big Anjali! Rahul's old dost! His very first best friend!
+
+Now big Anjali had grown up too. She had a friend, a very silly, very funny fellow named Aman, who followed her around like a happy puppy and always said the wrong thing at the wrong moment and tripped over things that weren't even there. Aman was not mean, not even a little bit. He was just wonderfully, hilariously bumbling. Like a cartoon. Every time he tried to be impressive, something went comically, perfectly wrong. Splat. Whoops. Oh no, not again, Aman!
+
+Little Anjali thought he was very funny. But she also thought, accha, okay, he is not the right person for her papa. She had someone else in mind.
+
+So little Anjali and big Anjali became friends, fast and warm, like they had always known each other. And slowly, slowly, like sunrise coming in through the curtains, Rahul and Anjali found each other again.
+
+They remembered. They remembered basketball and tiffin and laughing too loud. They remembered being the best of friends. And their hearts, both of them, started doing those little happy jumps.
+
+And Aman, dear silly Aman, even though his heart was a little bit sad, he smiled. Because he was bahut brave too. Just like Anjali had been brave all those years ago. He wanted his dost to be happy. And that made him the most loveable, most wonderful, most cartoonishly clumsy hero of all.
+
+And so, beta, Rahul and Anjali found their way back to each other. And little Anjali had a family full of warmth and laughter. And somewhere up in the sky, next to chanda mama, a kind soul named Tina looked down and smiled the softest, most peaceful smile.
+
+Because love finds its way home. It always, always does.
+
+Now close your eyes, sweetheart. The stars are out. Chanda mama is watching over you. And everyone in our story is ghar, safe at home, happy and warm, just like you right now.
+
+So jao, little one. Sweet dreams. I love you so much.
+
+---
+
+## Lagaan
+
+_1012 words · 5,472 characters_
+
+Okay little one, snuggle up tight. Pull that blanket all the way up to your chin. Yes, just like that. Are you cozy? Good. Because tonight, I have the most wonderful story for you. A story about a brave boy, a silly silly man, and the most exciting game of cricket you ever did hear of.
+
+Ready? Here we go.
+
+Once upon a time, in a little village called Champaner, there lived a kind and cheerful young man named Bhuvan. Oh, you would have loved Bhuvan. He had the biggest smile and the loudest laugh, and everyone in the village was his dost, his very best friend. The children followed him around everywhere. The old people waved at him from their doorways. Even the little birds seemed to sing a little louder when Bhuvan walked by.
+
+Now, Champaner was a beautiful village, beta. There were golden fields and big open skies and a well right in the middle of the village square. But the village had one very big, very annoying problem. And that problem had a name. His name was Captain Russell.
+
+Oh, Captain Russell. Where do I even begin with this man. He wore a big stiff uniform that was too tight around the middle. He had a moustache that curled up on both ends like a sleeping caterpillar. And he stomped around giving orders in a very loud, very silly voice. HARRUMPH. HARRUMPH. That was basically all he said.
+
+Captain Russell decided, all on his own, that the people of Champaner had to pay something called lagaan. Lagaan means a big pile of taxes, little one. Like if someone said you had to give away all your favourite biscuits before dinner. Every single one. Not very fair, is it?
+
+Accha, so the village people were very sad. The fields were dry. There had been no rain. They had barely enough food for themselves. And now this silly caterpillar-moustache man wanted even more from them? Bahut bura, that is what it was. Very very bad.
+
+Bhuvan went to Captain Russell and said, very politely, "Sir, please. We have nothing to give." And do you know what Captain Russell said? He pointed at the cricket field behind his big house and said, "Fine then. You play a cricket match against my soldiers. If you WIN, no lagaan for THREE whole years. But if you LOSE, you pay DOUBLE."
+
+Oof. That was a big bet, wasn't it?
+
+Now here is the thing. Bhuvan had never really played proper cricket before. And the village people? They had never played at all. Some of them had never even held a bat. One old man thought the ball was something you eat. It was a bit of a pickle, to be honest.
+
+But Bhuvan was not worried. Not even a little bit. He just smiled that big smile and said, "Chalo. Let us learn."
+
+And so the whole village came together. Farmers and potters and weavers and shepherds. Old and young. There was a man who could bowl so fast nobody could see the ball. There was a fellow who could catch anything — he once caught a mango falling from the very top of a tall tree! There was even someone with only one arm who turned out to be the most surprising player of all. Shabash to all of them.
+
+Now, Captain Russell also had a kind sister called Elizabeth. She saw how hard the village was working and she thought, this is not fair at all. She became a good friend to the village people. She taught them tricks and rules of cricket, all in secret, while Captain Russell was busy harrumphing around. She was a true dost, a really true friend.
+
+The day of the big match came. Oh, little one, the whole sky seemed to hold its breath.
+
+Captain Russell's soldiers were very good at cricket. Very good indeed. They batted and they bowled and they seemed so so confident. Captain Russell sat in his big chair, sipping his tea, already planning how to spend all that double lagaan money. Harrumph harrumph.
+
+But our village team did not give up. Not once. When they felt tired, they looked at each other and smiled. When it felt too hard, they thought of their ghar, their home, and their families, and kept going. They played and they tried and they laughed even when things went wrong. Because that is what you do when you have good friends beside you.
+
+And then, near the very end, something magical happened. The clouds, the big dark rain clouds, had been hiding up in the sky for such a long time. And just as Bhuvan hit the most brilliant, most beautiful, most wonderful shot you ever saw, the clouds burst open. Rain came pouring down. Cool and sweet and beautiful.
+
+The village had won the match.
+
+The fields drank up the rain. The crops began to grow again. Captain Russell made such a grumpy face that his caterpillar moustache drooped right down. He had to pack his bags and go away, and I do not think anyone in Champaner missed him very much. Not even a tiny little bit.
+
+And the village? Oh, the village was so khush. So happy. Everyone danced in the rain, bahut khushi se, with so much joy. Bhuvan danced. His friends danced. Even the old man who thought the ball was food danced.
+
+They had done it together. All of them. That was the real magic.
+
+So you see, beta, it does not matter how hard something looks. It does not matter if the other team is bigger or louder or has a caterpillar moustache. When you work together, when you are kind, when you never give up on your dost and they never give up on you, wonderful things happen.
+
+Now the rain is falling softly outside, can you hear it? Just like in Champaner.
+
+Close your eyes, little one. Chanda mama, the moon, is watching over you tonight. So jao now. Sleep sleep sleep. I love you so much.
+
+---
+
+## Taare Zameen Par
+
+_991 words · 5,466 characters_
+
+Okay little one, snuggle up tight. Pull that blanket all the way up to your chin. That's it. Are you cozy? Good. Because tonight I'm going to tell you the most wonderful story about a little boy who saw the whole world in a magical, magical way.
+
+His name was Ishaan. And Ishaan was eight years old, just like some of your friends, and he lived in a big, busy house with his mama and papa and his big brother Yohaan. Ishaan loved so many things. He loved puddles. He loved dogs. He loved watching a little fish swim round and round in a glass bowl. He loved colors more than anything in the whole wide world. When Ishaan looked at a butterfly, beta, he didn't just see a butterfly. He saw a hundred dancing colors all at once.
+
+But school. Oh, school was very, very hard for Ishaan.
+
+You see, when Ishaan looked at letters on a page, the letters didn't sit still. They jumped. They spun. They did little wiggly dances all over the place. The letter B would wave hello to the letter D. The number 3 would spin around and pretend to be an 8. Ishaan would stare and stare and try so hard, but the letters just would not behave. Not even a little bit.
+
+His teacher at school was very grumpy. Oh, she was so grumpy, this teacher. She had a voice like a foghorn and eyebrows that went all the way up to the sky when she was cross. She would say, "Ishaan! Pay attention!" And poor Ishaan was paying attention, he really was, but not to the blackboard. He was paying attention to the sparrow sitting on the window ledge. Because the sparrow was doing something very interesting, you see.
+
+The other children would laugh sometimes. And that made Ishaan feel very small inside. Very small and very alone.
+
+His papa was worried. His mama was worried too. Chalo, they said, chalo, let's try a new school, a boarding school, maybe that will help our Ishaan. So Ishaan was sent away to a new school, far from his ghar, far from his home, far from his mama's warm hugs and his fish and his puddles.
+
+At first, Ishaan was so, so sad. He would sit by the window at night and look at the chanda mama, the moon, and miss his family bahut, so very much. The new school was strict and loud and nobody there understood him either. The new grumpy teachers were even funnier looking than the last one. One had a mustache that curled up like two little snails. One wore shoes that squeaked with every single step. Squeeeeak. Squeeeak. Ishaan would hear him coming down the hall and almost want to smile, even on his saddest days.
+
+And then. Oh, and then, little one, something wonderful happened.
+
+A new art teacher came to the school. His name was Ram Shankar Nikumbh, but everyone called him Nikumbh Sir. And Nikumbh Sir was not like any teacher Ishaan had ever seen. He came into the classroom and he didn't shout. He didn't frown. He did a little dance. He told jokes. He made the children laugh and laugh. He made art feel like flying.
+
+Nikumbh Sir noticed Ishaan right away. He noticed that Ishaan wasn't lazy. He noticed that Ishaan wasn't naughty. He noticed that Ishaan's eyes were full of something beautiful, something special, something the other grown-ups had been too busy to see.
+
+So Nikumbh Sir did something very kind. He sat down with Ishaan, just the two of them, very quietly. And he showed Ishaan that some people's brains, some very wonderful, very special brains, just read letters differently. It had a long name, this thing, called dyslexia. And it didn't mean Ishaan was silly. It didn't mean Ishaan was bad. It meant Ishaan's brain was creative and clever and one of a kind.
+
+Shabash, said Nikumbh Sir softly. Shabash, Ishaan. Well done for trying so hard all this time.
+
+And do you know what? Ishaan started to learn. Slowly, slowly, like a little seedling pushing up through the mud, he started to learn. Nikumbh Sir taught him with pictures and games and colors and fun. And the letters, those wiggly, jumpy, naughty letters, they started to slow down just a little. Just enough.
+
+Accha, accha, good, good, Nikumbh Sir would say when Ishaan got something right, and Ishaan would glow like a little lamp.
+
+The school had a big painting competition one day. Every child and every teacher could enter. And Ishaan painted something so beautiful, so full of color and joy and magic, that everyone stopped and stared. His painting had the fish from home. It had the chanda mama glowing silver. It had puddles full of rainbow colors. It had everything he loved all in one place.
+
+And Ishaan won. He actually won.
+
+When Nikumbh Sir picked Ishaan up and swung him around, Ishaan laughed the biggest laugh. And his mama and papa were there, his ghar people, his family, watching with tears and smiles all mixed up together. His dost, his very best friend at school, cheered the loudest of all.
+
+Everyone finally saw what had always been true. Ishaan was not behind. Ishaan had never been behind. Ishaan had been flying the whole time. Just in his own direction.
+
+And so, my little one, here is what this story wants to whisper to you as you close your eyes. You are special too. Exactly as you are. Your brain is wonderful. Your heart is wonderful. And anyone who takes the time to really look, to really see you, will find something absolutely magical inside.
+
+So jao now. Go to sleep, my precious one. Dream of colors and puddles and moons. Dream of sparrows on window ledges. Dream of someone who believes in you. I do. I always, always do.
+
+So jao. So jao. Goodnight.
+
+---
+
+## Dangal
+
+_980 words · 5,331 characters_
+
+Okay little one, snuggle up tight. Pull that blanket all the way up to your chin. That's it. Are you cozy? Good. Because tonight I'm going to tell you the most wonderful story about a papa who loved his children so, so much. And two brave, amazing girls who showed the whole world what they could do.
+
+Ready? Here we go.
+
+Once upon a time, in a little village in India, there lived a man named Mahavir. Mahavir was a wrestler. Oh, he was a very good wrestler too! He was so strong and so clever that he always dreamed of winning the biggest, shiniest gold medal in the whole world. But life got busy, beta. That's what we call a little one we love — beta. And Mahavir had to stop wrestling and take care of his family instead.
+
+But that dream? That golden dream? It stayed right there in his heart. Like a little warm light that never went out.
+
+Now Mahavir and his wife had daughters. First came Geeta. Then came Babita. And oh, these two girls were something special. One day, some boys from the village came running to Mahavir looking very, very sorry for themselves. Their clothes were all crumpled and their hair was sticking up every which way. They looked absolutely ridiculous, like two little confused chickens!
+
+Mahavir looked at them and said, "What happened to you?"
+
+And the boys pointed at Geeta and Babita and said, "Them! Those two girls!"
+
+And do you know what? Mahavir didn't get upset. He got a big, big smile on his face instead. Because he saw something wonderful. His little girls were strong. His little girls were brave. His little girls could be wrestlers, just like him!
+
+So the very next morning — and this is the funny part, little one — Mahavir woke Geeta and Babita up very, very early. Before the sun was even awake! The chanda mama, the moon, was still up in the sky! The girls were SO grumpy. They did not want to get up. They pulled their blankets over their heads just like you like to do!
+
+But Papa said, "Chalo, chalo! Let's go, let's go!" And chalo they went.
+
+Every single morning, they ran and they practiced and they tumbled in the mud and they got up again. At first the girls thought, this is no fun at all! But slowly, slowly, something magical happened. They started to get stronger. They started to get faster. And they started to WIN.
+
+Now, not everyone was nice about it. There was a very silly man who ran the wrestling competitions. He had a big round belly and a very tiny mustache that wiggled when he talked. He kept saying, "Girls cannot wrestle! Girls cannot win!" in a very pompous, puffed-up voice. Every time he said it, his mustache wiggled so much it looked like a little caterpillar trying to run away from his face. Very silly man. Nobody needs to be scared of a man with a runaway-caterpillar mustache, do they?
+
+Geeta trained and trained. She was bahut brave — bahut means very, very much. She was bahut strong. And her dost, her very best friend and sister Babita, trained right alongside her.
+
+Then one day, it was time for Geeta to go to a big special wrestling school far from home. Mahavir hugged her tight and said, "You can do this, my beta." And off she went.
+
+At the big school there was a coach who thought he knew everything. He had a very loud voice and very squeaky shoes. Squeak squeak squeak everywhere he walked. He kept telling Geeta to forget everything her papa taught her. And for a little while, Geeta listened. She started losing her matches. She felt sad and confused.
+
+But do you know who never stopped believing in her? Papa. Her papa wrote her letters. He found ways to talk to her and remind her of all the things she already knew deep in her heart.
+
+And Geeta remembered. She remembered all those early mornings. She remembered the mud and the running and the getting back up again. She remembered her dost Babita cheering for her. She remembered Papa's voice saying, "Shabash! Well done!" Shabash — that's what you say when someone does something really wonderful and you are so proud your heart feels like it might pop.
+
+And then came the biggest match of all. The whole world was watching. Geeta stepped onto the mat. Her heart was going thump thump thump. But she took a deep breath. And she wrestled with everything she had. She was clever. She was quick. She remembered every single thing Papa ever taught her.
+
+And she WON. She won the gold medal. The great big shiny gold medal that her papa had always dreamed of. Except now it wasn't just his dream anymore. It was her dream. Her very own.
+
+When Mahavir saw his daughter standing there, holding that medal up high, his eyes got all sparkly with happy tears. He held her close and whispered, "You are not just my beta. You are my champion."
+
+And Geeta hugged him back so tight.
+
+The whole family was so khush that night — khush means happy, the warm bubbly kind of happy that fills you right up to the top. They laughed and they celebrated and they were together, and that was the best part of all.
+
+So you see, little one, it doesn't matter if someone says you can't. It matters that you keep trying. It matters that you have people who love you cheering you on.
+
+And now the story is done, and the stars are out, and the chanda mama is watching over you tonight, just like always.
+
+Close your eyes now, beta.
+
+So jao. Time to sleep.
+
+I love you so much. So, so much.
+
+Goodnight.
+
+---
+
+## Bajrangi Bhaijaan
+
+_1004 words · 5,436 characters_
+
+Okay little one, snuggle up tight. Pull that blanket all the way up to your chin. That's it. Are you cozy? Good. Because tonight I have the most wonderful story for you. It's about a big, kind man, a tiny brave girl, and the longest, silliest, most beautiful adventure you ever heard of.
+
+Ready? Here we go.
+
+Once upon a time, there was a man named Pawan. Everyone called him Bajrangi. Bajrangi was a big, gentle fellow with a big, round smile. He loved two things more than anything in the whole world. He loved God, and he loved being kind. That's it. That was Bajrangi. Simple and good, just like that.
+
+Now Bajrangi had one little problem. He was not very good at being clever. If someone said "don't look behind you," Bajrangi would look behind him. Every single time. He was sweet and he was funny and he was just a little bit silly. But his heart? Oh, his heart was the biggest, warmest heart you ever saw.
+
+One day, Bajrangi was at a big, noisy train station. There were people rushing everywhere. Chai wallahs selling tea, pigeons flapping around, trains going whoooosh past the platform. And right there, sitting all alone on a bench, was a tiny little girl.
+
+She had big, big eyes. And she was very, very quiet.
+
+Bajrangi looked at her. He looked left. He looked right. No mama. No papa. No dadi, no nani, nobody. Just this one small girl, all by herself, hugging her little dupatta tight.
+
+Bajrangi sat down next to her and said, "Hello, beta." Beta means little one, just like I call you. But the girl didn't say anything back. She just blinked her big eyes at him.
+
+Now here is the thing. This little girl could not speak. Not one word. But she could smile. And oh, when she smiled, the whole world felt warm and bright.
+
+Bajrangi called her Munni. Just Munni. Because she was small and sweet like a little moon.
+
+Munni had gotten lost from her mama at the train station. She had wandered off to look at a pretty butterfly, and when she turned around, mama was gone. Poor little Munni. But she was brave, you know. She didn't cry for too long. She just waited. And then Bajrangi found her. Or maybe she found him.
+
+Bajrangi decided right then and there, he would find Munni's home. He would take her back to her mama. That's what good people do, he thought. Chalo, let's go. That means, come on, let's go. And off they went.
+
+Now, Munni was from a place far, far away. Across mountains and rivers and a whole border. She was from Pakistan! That's a whole other country, beta. Very far. But Bajrangi was not afraid. He just held Munni's little hand and said, "We will find your mama. I promise."
+
+Along the way, they met all sorts of funny people. There was a silly border guard who kept dropping his very important papers. Every time he bent down to pick them up, something else fell out of his pockets. His pen. His hat. His lunch. Plop, plop, plop. Bajrangi and Munni had to cover their mouths so they didn't laugh too loud.
+
+There was also a funny policeman who was always tripping over his own big boots. He was supposed to be very serious and important, but he could never quite manage it. He would puff out his chest and say something official, and then walk straight into a door. Bonk. Munni giggled every time.
+
+Bajrangi made a dost in Pakistan too. A dost is a very best friend. His name was Chand Nawab, and he was a reporter who wanted to be famous. Chand was cheerful and chatty and he talked SO much. He had a little camera and big dreams and he loved Munni just like everyone did. He decided to help Bajrangi find Munni's home. Because that is what dosts do.
+
+The three of them walked through little villages and big markets. They ate hot rotis by the fire. They slept under the stars, and Munni would point up at chanda mama, the moon, and smile. Chanda mama means Uncle Moon. And the moon seemed to smile right back at her.
+
+Everywhere they went, kind people helped them. A kind old woman gave them food. A small boy showed them the road. A jolly shopkeeper let them rest. People are mostly good, little one. Mostly, mostly good.
+
+And then, one golden afternoon, they heard it. A woman's voice, far away, calling and calling. Munni's ears went up like a little bunny. Her eyes went wide. She knew that voice. She knew it in her whole heart.
+
+She ran. Munni, who never made a sound, who was always so quiet, she ran through the crowd, her little feet going pat pat pat pat on the ground. And her mama was running too, arms wide open.
+
+And they hugged. Oh, they hugged so tight. And Munni's mama was crying happy tears, and Munni was making little sounds into her mama's shoulder, the happiest sounds, and everyone around them was crying too. Even big Bajrangi was crying. Even Chand was crying. Even I am a little bit crying just telling you this part.
+
+Bahut khush. That means very, very happy. Everyone was bahut khush.
+
+Bajrangi looked at Munni one last time. She looked back at him. She didn't need words. She never did. She just put her small hand on her heart. And he put his big hand on his heart. And that was enough.
+
+Shabash, brave Bajrangi. Well done. You did it.
+
+And now, little one, everyone is home. Munni is home. You are home. You are safe and warm and loved, just like Munni. Close your eyes now. Let your body feel heavy and soft. The moon is watching over you tonight, just like chanda mama watched over Munni. So jao, baby. Time to sleep. So jao.
+
+Goodnight, my little Munni. Goodnight.
+
+---
+
+## Pathaan
+
+_1001 words · 5,433 characters_
+
+Okay little one, snuggle up tight. Pull that blanket all the way up to your chin. Yes, just like that. Are you cozy? Good. Because tonight I have a really, really special story for you. It's about a very brave hero, and some very silly, very bumbling bad guys, and the most wonderful thing of all — coming home.
+
+So close your eyes just a little bit, and listen.
+
+Once upon a time, there was a hero named Pathaan.
+
+Pathaan was tall and kind and had the biggest, warmest heart you can imagine. He loved his country — India — more than anything in the whole wide world. He was like a secret guardian angel, always out there keeping everyone safe, even when nobody knew his name.
+
+But one day, something sad happened. Pathaan got lost far, far away from home. He was all alone in faraway lands, doing his important hero work, and he missed India so, so much. He missed the smells and the sounds and the warm, golden light of his ghar, his home. Every night he would look up at the moon — the chanda mama shining bright in the sky — and whisper, "I will find my way back. I promise."
+
+Now, while Pathaan was far away, there was a very silly villain. His name was Jim.
+
+Oh, Jim was SO silly, beta. He wore a big dramatic coat and he was always tripping over his own plans. He thought he was the cleverest person in the whole universe. He really, really did. But every single time he came up with a big bad idea, something would go hilariously, wonderfully wrong. His henchmen — his little helpers — were even sillier. They bumped into each other. They forgot which door was the exit. One of them once accidentally locked himself inside his own getaway car. Can you imagine?
+
+Jim's plan was to cause big trouble. He wanted to create something called a super-cold freeze spray — like the world's biggest, most ridiculous ice cream freeze — and use it to make a big mess. He had jars and bottles and canisters of this silly freeze stuff stored in different places all over the world.
+
+But guess what? Pathaan found out.
+
+And Pathaan said, "Nahi. No way. Not on my watch."
+
+So Pathaan was called back — back toward home, back toward India — to stop Jim and his bumbling bunch. And oh, beta, his heart was SO happy. Because even though the mission was important, it meant he was going home. Going back to his ghar.
+
+Now, on this big adventure, Pathaan met a new friend. Her name was Rubai. She was brave and smart and incredibly clever — the kind of person who could solve a puzzle in two seconds flat and then do a cartwheel just for fun. Rubai became Pathaan's best dost, his very best friend. They looked out for each other. When Pathaan forgot to eat his lunch because he was too busy being heroic, Rubai reminded him. When Rubai needed someone to trust completely, Pathaan was always there. That's what real dosts do, you know. They show up. Every time.
+
+Together, Pathaan and Rubai travelled to snowy mountains and sunny beaches and bustling busy cities. Everywhere Jim tried to make trouble, Pathaan and Rubai were one step ahead — being clever, being kind, and honestly, watching Jim trip over his own silly plans was the funniest thing of all.
+
+One time, Jim tried to sneak away on a big fancy speedboat. But Rubai had quietly tied the boat's rope to the dock. So when Jim zoomed off feeling very proud of himself — the boat just went... bonk. It didn't move an inch. Jim looked so confused. Pathaan and Rubai tried very hard not to giggle. They mostly failed.
+
+Bahut funny, so very funny.
+
+But then came the hardest part of the story, little one. Jim did something really not nice. He tried to use his silly freeze spray on a whole big city. And for a moment — just a moment — it looked like maybe, just maybe, he might actually do it.
+
+Pathaan stood up very tall.
+
+He thought about his ghar. He thought about the chanda mama in the sky. He thought about every person sleeping safely in their homes, just like you are right now. And he felt something strong and warm bloom right in the middle of his chest.
+
+Love for home is the most powerful thing in the world, you know.
+
+Pathaan was SO clever. He switched all of Jim's canisters around when Jim wasn't looking. So when Jim pressed his big dramatic button — expecting a huge freezy boom — out came... bubbles. Thousands and thousands of soft, floaty, rainbow bubbles. They drifted up into the sky like the most beautiful thing you've ever seen.
+
+Jim looked at the bubbles. He looked at his button. He pressed it again. More bubbles.
+
+Shabash, Pathaan! Well done, well done!
+
+Jim was so confused and so embarrassed that he sat right down on the ground and pouted. His henchmen started popping the bubbles because honestly it was very fun and they had forgotten they were supposed to be villains.
+
+And just like that, accha — just like that, all was well.
+
+Pathaan and Rubai came home to India. To the warm golden light. To the smell of home. To everything they had missed so, so much. Pathaan looked up at the night sky — at the chanda mama glowing soft and round — and he smiled the biggest, most peaceful smile.
+
+He was home. He was finally, truly home.
+
+And somewhere, Jim was still popping bubbles and feeling a little bit better about everything.
+
+So now you close your eyes, beta. You're safe and warm, just like Pathaan came home to be. Your ghar is right here. Your people are right here.
+
+So jao now, little love. Sleep tight.
+
+The chanda mama is watching over you tonight.
+
+---
+
+## Jawan
+
+_920 words · 4,966 characters_
+
+Okay little one, snuggle up tight. Pull that blanket all the way up to your chin. Yes, just like that. Are you cozy? Good. Because tonight I have a really, really good story for you. It's about a very brave man, and a little secret, and lots and lots of heart. Ready? Here we go.
+
+Once upon a time, there was a man named Vikram. And Vikram had the biggest heart you ever saw. Like, imagine the biggest heart you can think of. Now make it bigger. That's Vikram's heart.
+
+Vikram lived on a big, bouncy boat that rocked gently on the water. Shhh, can you hear the waves? Rock, rock, rock. Just like that. On this boat, Vikram had a whole team of friends. His dost, his very best friends in the whole world. And these friends were all women who were super duper smart and brave and kind. Vikram had taught them everything. How to be clever. How to be strong. How to help people. Vikram loved his little team very much. Bahut, bahut much. Bahut means a whole lot, and that's exactly how much he loved them.
+
+Now, Vikram had a big job to do. See, there were some people out in the world who were being very unfair. People who were supposed to help others but instead they were being greedy and selfish and silly. The silliest of all was a man named Kalee. Oh beta, Kalee was SO silly. He wore a big poofy suit and he was always tripping over his own shoelaces. Every single time he tried to do something sneaky, something went wrong. He'd try to sneak away and bonk into a door. He'd try to make a big scary speech and his toupee would fall right off his head. His helpers weren't much better. They bumbled and tumbled and bumped into each other like a bunch of bouncy balls in a box. You would have laughed and laughed.
+
+But even though Kalee was silly, he wasn't being fair to people. And that made Vikram go, accha, okay then. Accha means alright, time to fix this. And fixing things was exactly what Vikram did best.
+
+So Vikram had a very clever plan. A sneaky, twinkly, brilliant plan. He dressed up in a disguise. Can you guess what he dressed up as? A jail warden! That means someone who looks after a big building. And inside this building, he gathered all the people who needed help. People who had been treated unfairly. People whose families were sad. And Vikram said, I will be your friend. I will help you. We will fix things together.
+
+And they did, beta. Not with fighting. Not with anything scary. With cleverness. With truth. With telling the right people the right things at the right time. Like puzzle pieces clicking into place. Click, click, click.
+
+There was also someone else in this story. A strong and good police officer named Narmada. She was Vikram's most important dost, his very most important friend. At first, Narmada thought Vikram was making trouble. But slowly, slowly, she started to see that his heart was good. That he only wanted fairness for everyone. And when she understood, she stood right beside him. Because that is what real dosts do. They stand beside you.
+
+Now, here is the most special part of the whole story, little one. Vikram had a secret. A very old, very tender secret. Long, long ago, when Vikram was young, something sad happened. He had a mama who loved him so much, just like your mama loves you. And they got separated. Lost from each other for so many years. And all those years, Vikram carried her love right here, in his big heart. Never ever letting go.
+
+And do you know what happened? They found each other. After all that time. His mama looked at him and he looked at her and it was the most khush moment you can imagine. Khush means happy, the kind of happy that makes your whole face shine like chanda mama in the sky. Chanda mama, the moon, big and bright and full of love, just watching over everyone below.
+
+When Kalee finally got caught, it wasn't anything scary. His toupee fell off one last time. He slipped on a banana peel. His poofy suit got stuck in a revolving door and he went round and round and round until he was too dizzy to be naughty anymore. And everyone clapped and said, shabash, well done, Vikram! Shabash! The people who had been treated unfairly finally got to go home to their families. And everything felt warm and right and good.
+
+Vikram stood on his big bouncy boat again. The waves went rock, rock, rock. His team of dosts stood around him, all smiling. His mama was safe. Narmada was there too, proud and kind. And Vikram looked up at the sky and thought, this is my ghar. Ghar means home. And home isn't always a building with four walls. Sometimes home is the people who love you, standing all around you.
+
+And now, little one, the boat is rocking so gently. Rock, rock, rock. The stars are coming out one by one. Chanda mama is climbing up into the sky to watch over you tonight, just like he watched over Vikram.
+
+So jao now, sweet one. So jao means go to sleep. Close your little eyes. You are safe. You are loved. Bahut, bahut loved.
+
+So jao, beta. So jao.
+
+Goodnight.

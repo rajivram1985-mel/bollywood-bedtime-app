@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import appConfig from "../../app.json";
 
 import AgeSegmented from "../components/AgeSegmented";
+import LanguageSegmented from "../components/LanguageSegmented";
 import KidAvatar from "../components/KidAvatar";
 import { CloseIcon, PlusIcon } from "../components/Icons";
 import { useProfiles } from "../state/ProfileContext";
@@ -45,7 +46,10 @@ function KidRow({ kid, isActive, canRemove, onSelect, onChange, onRemove, autoFo
           </Pressable>
         ) : null}
       </View>
+      <Text style={styles.fieldLabel}>Age</Text>
       <AgeSegmented value={kid.ageRange} onChange={(ageRange) => onChange({ ageRange })} />
+      <Text style={styles.fieldLabel}>Stories in</Text>
+      <LanguageSegmented value={kid.language} onChange={(language) => onChange({ language })} />
     </View>
   );
 }
@@ -56,7 +60,7 @@ export default function SettingsSheet({ visible, onClose }) {
   const [newKidId, setNewKidId] = useState(null);
 
   const handleAdd = () => {
-    const id = addKid({ name: "", ageRange: activeKid?.ageRange });
+    const id = addKid({ name: "", ageRange: activeKid?.ageRange, language: activeKid?.language });
     setNewKidId(id);
   };
 
@@ -97,7 +101,10 @@ export default function SettingsSheet({ visible, onClose }) {
                 <Text style={styles.addText}>Add another child</Text>
               </Pressable>
             ) : null}
-            <Text style={styles.help}>Each child gets stories written for their age.</Text>
+            <Text style={styles.help}>
+              Each child gets stories written for their age, in their language. "Eng + Hindi" is English with everyday
+              Hindi words mixed in — a gentle way in for kids still learning Hindi.
+            </Text>
 
             <Text style={[styles.sectionLabel, { marginTop: 28 }]}>Stories per night</Text>
             <View style={styles.countRow}>
@@ -175,6 +182,7 @@ const styles = StyleSheet.create({
   },
   kidCardActive: { borderColor: colors.gold, backgroundColor: "rgba(246,166,35,0.08)" },
   kidTop: { flexDirection: "row", alignItems: "center", gap: 12 },
+  fieldLabel: { fontFamily: fonts.bodySemiBold, fontSize: 12, color: colors.textTertiary, marginBottom: -6 },
   radio: { width: 28, height: 28, alignItems: "center", justifyContent: "center" },
   radioOuter: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: colors.textTertiary, alignItems: "center", justifyContent: "center" },
   radioOuterActive: { borderColor: colors.gold },

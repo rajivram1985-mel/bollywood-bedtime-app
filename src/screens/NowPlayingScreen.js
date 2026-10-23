@@ -11,6 +11,7 @@ import { PlayIcon, PauseIcon, BackIcon, ForwardIcon, ChevronDownIcon, MoonIcon, 
 import { usePlayback } from "../player/usePlayback";
 import { useProfiles } from "../state/ProfileContext";
 import { ageLabel } from "../constants/ageRanges";
+import { languageLabel } from "../constants/languages";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
@@ -121,7 +122,7 @@ export default function NowPlayingScreen({ queue, onClose }) {
             <View style={styles.stage}>
               {readAlong ? (
                 <ScrollView style={styles.textPanel} contentContainerStyle={styles.textPanelContent}>
-                  <Text style={styles.storyText} selectable>
+                  <Text style={[styles.storyText, story.language === "hi" && styles.storyTextHi]} selectable>
                     {story.text}
                   </Text>
                 </ScrollView>
@@ -138,6 +139,7 @@ export default function NowPlayingScreen({ queue, onClose }) {
                 {story.title}
               </Text>
               <Text style={styles.meta}>
+                {story.language && story.language !== "en" ? `${languageLabel(story.language)} · ` : ""}
                 {story.ageRange ? `Ages ${ageLabel(story.ageRange)} · ` : ""}
                 {story.minutes} min · {story.narrated ? "Narrated" : "Read by your device's voice"}
               </Text>
@@ -335,6 +337,13 @@ const styles = StyleSheet.create({
     fontSize: 19,
     lineHeight: 32,
     color: colors.textPrimary,
+  },
+  // Devanagari has marks above and below the line, and Nunito has no
+  // Devanagari glyphs — use the system Hindi font with more leading.
+  storyTextHi: {
+    fontFamily: undefined,
+    fontSize: 20,
+    lineHeight: 38,
   },
 
   titleBlock: { gap: 4 },

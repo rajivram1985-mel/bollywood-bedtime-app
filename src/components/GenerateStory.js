@@ -19,6 +19,7 @@ import Animated, {
 import { generateStory } from "../utils/api";
 import { fetchMoviePoster } from "../utils/tmdb";
 import { ageLabel } from "../constants/ageRanges";
+import { languageLabel } from "../constants/languages";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
@@ -63,7 +64,7 @@ function PulseDot({ delay }) {
   return <Animated.View style={[styles.dot, style]} />;
 }
 
-export default function GenerateStory({ ageRange = "6-8", kidName, onGenerated }) {
+export default function GenerateStory({ ageRange = "6-8", language = "en", kidName, onGenerated }) {
   const [movieName, setMovieName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -75,9 +76,9 @@ export default function GenerateStory({ ageRange = "6-8", kidName, onGenerated }
     setLoading(true);
     setError(null);
     try {
-      const text = await generateStory(name, ageRange);
+      const text = await generateStory(name, ageRange, language);
       const posterUrl = await fetchMoviePoster(name);
-      onGenerated({ movieName: name, text, ageRange, posterUrl: posterUrl ?? null });
+      onGenerated({ movieName: name, text, ageRange, language, posterUrl: posterUrl ?? null });
       setMovieName("");
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
@@ -103,7 +104,7 @@ export default function GenerateStory({ ageRange = "6-8", kidName, onGenerated }
       </View>
       <Text style={styles.subtitle}>
         Name a Bollywood film you love and we'll write a gentle bedtime version
-        {kidName ? ` for ${kidName}` : ""}, ages {ageLabel(ageRange)}. It's saved under "Made by you".
+        {kidName ? ` for ${kidName}` : ""}, ages {ageLabel(ageRange)}{language !== "en" ? `, in ${languageLabel(language)}` : ""}. It's saved under "Made by you".
       </Text>
 
       {/* Input */}

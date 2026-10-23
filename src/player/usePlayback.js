@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createAudioEngine } from "./audioEngine";
-import { createSpeechEngine } from "./speechEngine";
+import { createSpeechEngine, NoVoiceError } from "./speechEngine";
 
 const idle = (story) => ({
   isPlaying: false,
@@ -45,7 +45,7 @@ export function usePlayback(story, { autoPlay = true, onFinish } = {}) {
 
     (async () => {
       try {
-        await engine.load(story.audio || story.text);
+        await engine.load(story.audio || story.text, story.language);
         if (cancelled) return;
         setStatus((p) => ({ ...p, isLoading: false }));
         if (autoPlay) await engine.play();
@@ -54,9 +54,12 @@ export function usePlayback(story, { autoPlay = true, onFinish } = {}) {
           setStatus((p) => ({
             ...p,
             isLoading: false,
-            error: e?.message?.includes("supported")
-              ? "Your browser can't read stories aloud. Try Chrome, Edge or Safari."
-              : "This story couldn't play. Try again in a moment.",
+            error:
+              e instanceof NoVoiceError
+                ? "This browser doesn't have a Hindi voice. Turn on Read along to read it aloud yourself, or open the app on your phone."
+                : e?.message?.includes("supported")
+                ? "Your browser can't read stories aloud. Try Chrome, Edge or Safari."
+                : "This story couldn't play. Try again in a moment.",
           }));
         }
       }

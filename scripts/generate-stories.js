@@ -1,29 +1,35 @@
 #!/usr/bin/env node
 /**
  * Generates bundled bedtime stories — text via Claude, optional narration via
- * ElevenLabs — for every film × age range, skipping anything already present.
+ * ElevenLabs — for every film × age × language, skipping anything already present.
  *
- *   node scripts/generate-stories.js                       # missing TEXT for all ages
+ *   node scripts/generate-stories.js                       # missing English TEXT for all ages
+ *   node scripts/generate-stories.js --langs=hi,en-hi       # these languages (en, en-hi, hi)
  *   node scripts/generate-stories.js --ages=3-5,9-12        # only these ages
  *   node scripts/generate-stories.js --films=ddlj,sholay    # only these films
  *   node scripts/generate-stories.js --audio                # also narrate missing audio (costs ElevenLabs credits)
  *   node scripts/generate-stories.js --dry-run              # print what would be generated + character count
  *
  * Output:
- *   src/data/storyTexts.json         — { [filmId]: { [ageRange]: text } }
- *   assets/audio/<filmId>-<age>.mp3  — raw ElevenLabs narration (run scripts/optimize-audio.js after)
- *   src/data/storyAudio.js           — regenerated require() manifest of all bundled audio
+ *   src/data/stories/<lang>.json              — { [filmId]: { [ageRange]: text } }
+ *   assets/audio/<filmId>-<age>[-<lang>].mp3  — raw narration; English has no suffix
+ *                                               (run scripts/optimize-audio.js after)
+ *   src/data/storyAudio.js                    — regenerated require() manifest of all bundled audio
+ *
+ * Voices: ELEVENLABS_VOICE_ID is the default. Set ELEVENLABS_VOICE_ID_HI (and
+ * ELEVENLABS_VOICE_ID_EN_HI) to use a native-accent voice for that language —
+ * an English voice reading Hindi sounds foreign.
  *
  * To add a new film: add it to FILMS below AND to src/data/films.js (with an illustration).
  */
 
 const fs = require("fs");
 const path = require("path");
-const { AGE_KEYS, buildStoryPrompt } = require("../shared/story-prompt.cjs");
-const { writeAudioManifest } = require("./lib/audio-manifest");
+const { AGE_KEYS, LANGUAGE_KEYS, buildStoryPrompt } = require("../shared/story-prompt.cjs");
+const { writeAudioManifest, audioBaseName } = require("./lib/audio-manifest");
 
 const ROOT = path.join(__dirname, "..");
-const TEXTS_PATH = path.join(ROOT, "src", "data", "storyTexts.json");
+const TEXTS_DIR = path.join(ROOT, "src", "data", "stories");
 const AUDIO_DIR = path.join(ROOT, "assets", "audio");
 
 // filmId must match src/data/films.js; promptTitle is what Claude sees.
@@ -61,7 +67,11 @@ function parseArgs() {
     const hit = args.find((a) => a.startsWith(`--${name}=`));
     return hit ? hit.split("=")[1].split(",").map((s) => s.trim()).filter(Boolean) : null;
   };
+  const langs = get("langs") || ["en"];
+  const unknown = langs.filter((l) => !LANGUAGE_KEYS.includes(l));
+  if (unknown.length) throw new Error(`Unknown language(s): ${unknown.join(", ")} — expected ${LANGUAGE_KEYS.join(", ")}`);
   return {
+    langs,
     ages: get("ages") || AGE_KEYS,
     films: get("films"),
     audio: args.includes("--audio"),
@@ -69,8 +79,16 @@ function parseArgs() {
   };
 }
 
+const textsPath = (lang) => path.join(TEXTS_DIR, `${lang}.json`);
+const loadTexts = (lang) => (fs.existsSync(textsPath(lang)) ? JSON.parse(fs.readFileSync(textsPath(lang), "utf8")) : {});
+
+function voiceFor(lang) {
+  const specific = process.env[`ELEVENLABS_VOICE_ID_${lang.toUpperCase().replace(/-/g, "_")}`];
+  return specific || process.env.ELEVENLABS_VOICE_ID;
+}
+
 // ─── Claude: story text ───────────────────────────────────────────────────────
-async function generateText(promptTitle, ageRange) {
+async function generateText(promptTitle, ageRange, lang) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -80,8 +98,9 @@ async function generateText(promptTitle, ageRange) {
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
-      max_tokens: 4096,
-      messages: [{ role: "user", content: buildStoryPrompt(promptTitle, ageRange) }],
+      // Devanagari costs more tokens per word than English.
+      max_tokens: lang === "hi" ? 12000 : 4096,
+      messages: [{ role: "user", content: buildStoryPrompt(promptTitle, ageRange, lang) }],
     }),
   });
   if (!res.ok) {
@@ -118,12 +137,12 @@ function splitForNarration(text) {
   return parts;
 }
 
-async function generateAudio(text) {
+async function generateAudio(text, voiceId) {
   const parts = splitForNarration(text);
   const buffers = [];
   for (let i = 0; i < parts.length; i++) {
     buffers.push(
-      await requestAudio(parts[i], {
+      await requestAudio(parts[i], voiceId, {
         previous_text: parts[i - 1]?.slice(-1000),
         next_text: parts[i + 1]?.slice(0, 1000),
       })
@@ -132,24 +151,21 @@ async function generateAudio(text) {
   return Buffer.concat(buffers);
 }
 
-async function requestAudio(text, context = {}) {
-  const res = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${process.env.ELEVENLABS_VOICE_ID}`,
-    {
-      method: "POST",
-      headers: {
-        "xi-api-key": process.env.ELEVENLABS_API_KEY,
-        "Content-Type": "application/json",
-        Accept: "audio/mpeg",
-      },
-      body: JSON.stringify({
-        text,
-        model_id: "eleven_multilingual_v2",
-        voice_settings: { stability: 0.6, similarity_boost: 0.75, style: 0.4, use_speaker_boost: true },
-        ...context,
-      }),
-    }
-  );
+async function requestAudio(text, voiceId, context = {}) {
+  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+    method: "POST",
+    headers: {
+      "xi-api-key": process.env.ELEVENLABS_API_KEY,
+      "Content-Type": "application/json",
+      Accept: "audio/mpeg",
+    },
+    body: JSON.stringify({
+      text,
+      model_id: "eleven_multilingual_v2",
+      voice_settings: { stability: 0.6, similarity_boost: 0.75, style: 0.4, use_speaker_boost: true },
+      ...context,
+    }),
+  });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err?.detail?.message || `Audio generation failed (${res.status})`);
@@ -157,70 +173,76 @@ async function requestAudio(text, context = {}) {
   return Buffer.from(await res.arrayBuffer());
 }
 
-function hasAudio(filmId, age) {
-  return ["m4a", "mp3"].some((ext) => fs.existsSync(path.join(AUDIO_DIR, `${filmId}-${age}.${ext}`)));
+function hasAudio(filmId, age, lang) {
+  const base = audioBaseName(filmId, age, lang);
+  return ["m4a", "mp3"].some((ext) => fs.existsSync(path.join(AUDIO_DIR, `${base}.${ext}`)));
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 async function main() {
   loadEnv();
   const opts = parseArgs();
-  const texts = fs.existsSync(TEXTS_PATH) ? JSON.parse(fs.readFileSync(TEXTS_PATH, "utf8")) : {};
   const films = opts.films ? FILMS.filter((f) => opts.films.includes(f.id)) : FILMS;
+  const texts = Object.fromEntries(opts.langs.map((l) => [l, loadTexts(l)]));
 
   const textJobs = [];
   const audioJobs = [];
-  for (const film of films) {
-    for (const age of opts.ages) {
-      if (!texts[film.id]?.[age]) textJobs.push({ film, age });
-      if (opts.audio && !hasAudio(film.id, age)) audioJobs.push({ film, age });
+  for (const lang of opts.langs) {
+    for (const film of films) {
+      for (const age of opts.ages) {
+        if (!texts[lang][film.id]?.[age]) textJobs.push({ film, age, lang });
+        if (opts.audio && !hasAudio(film.id, age, lang)) audioJobs.push({ film, age, lang });
+      }
     }
   }
 
   console.log(`📝 ${textJobs.length} stories to write, 🎙️ ${audioJobs.length} to narrate`);
   if (opts.dryRun) {
-    const chars = audioJobs.reduce((n, { film, age }) => n + (texts[film.id]?.[age]?.length || 0), 0);
-    for (const j of textJobs) console.log(`   text  ${j.film.id} ${j.age}`);
-    for (const j of audioJobs) console.log(`   audio ${j.film.id} ${j.age}`);
+    const chars = audioJobs.reduce((n, j) => n + (texts[j.lang][j.film.id]?.[j.age]?.length || 0), 0);
+    for (const j of textJobs) console.log(`   text  ${j.lang} ${j.film.id} ${j.age}`);
+    for (const j of audioJobs) console.log(`   audio ${j.lang} ${j.film.id} ${j.age}  voice=${voiceFor(j.lang) ? "set" : "MISSING"}`);
     console.log(`   ElevenLabs characters for stories that already have text: ${chars.toLocaleString()}`);
     return;
   }
 
   if (textJobs.length && !process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY not set");
-  if (audioJobs.length && (!process.env.ELEVENLABS_API_KEY || !process.env.ELEVENLABS_VOICE_ID)) {
-    throw new Error("ELEVENLABS_API_KEY and ELEVENLABS_VOICE_ID are required for --audio");
-  }
-  if (audioJobs.length && !process.env.ELEVENLABS_API_KEY.startsWith("sk_")) {
-    throw new Error(
-      "ELEVENLABS_API_KEY doesn't look like a secret key (they start with 'sk_'). " +
-        "The dashboard's key ID won't work — create a key under Developers → API Keys and copy it when shown."
-    );
+  if (audioJobs.length) {
+    if (!process.env.ELEVENLABS_API_KEY) throw new Error("ELEVENLABS_API_KEY is required for --audio");
+    if (!process.env.ELEVENLABS_API_KEY.startsWith("sk_")) {
+      throw new Error(
+        "ELEVENLABS_API_KEY doesn't look like a secret key (they start with 'sk_'). " +
+          "The dashboard's key ID won't work — create a key under Developers → API Keys and copy it when shown."
+      );
+    }
+    const missing = [...new Set(audioJobs.map((j) => j.lang))].filter((l) => !voiceFor(l));
+    if (missing.length) throw new Error(`No ElevenLabs voice configured for: ${missing.join(", ")}`);
   }
 
   // Text: run a few in parallel, save after each so a failure never loses work.
+  fs.mkdirSync(TEXTS_DIR, { recursive: true });
   const queue = [...textJobs];
   const worker = async () => {
     while (queue.length) {
-      const { film, age } = queue.shift();
+      const { film, age, lang } = queue.shift();
       try {
-        const text = await generateText(film.promptTitle, age);
-        texts[film.id] = { ...(texts[film.id] || {}), [age]: text };
-        fs.writeFileSync(TEXTS_PATH, JSON.stringify(texts, null, 2) + "\n");
-        console.log(`   ✅ ${film.id} ${age} — ${text.split(/\s+/).length} words`);
+        const text = await generateText(film.promptTitle, age, lang);
+        texts[lang][film.id] = { ...(texts[lang][film.id] || {}), [age]: text };
+        fs.writeFileSync(textsPath(lang), JSON.stringify(texts[lang], null, 2) + "\n");
+        console.log(`   ✅ ${lang} ${film.id} ${age} — ${text.split(/\s+/).length} words, ${text.length} chars`);
       } catch (e) {
-        console.log(`   ❌ ${film.id} ${age} — ${e.message}`);
+        console.log(`   ❌ ${lang} ${film.id} ${age} — ${e.message}`);
       }
     }
   };
   await Promise.all([worker(), worker(), worker()]);
 
   // Audio: sequential (ElevenLabs concurrency limits are low on most plans).
-  for (const { film, age } of audioJobs) {
-    const text = texts[film.id]?.[age];
+  for (const { film, age, lang } of audioJobs) {
+    const text = texts[lang][film.id]?.[age];
     if (!text) continue;
-    process.stdout.write(`   🎙️ ${film.id} ${age} (${text.length.toLocaleString()} chars)… `);
-    const buf = await generateAudio(text);
-    fs.writeFileSync(path.join(AUDIO_DIR, `${film.id}-${age}.mp3`), buf);
+    process.stdout.write(`   🎙️ ${lang} ${film.id} ${age} (${text.length.toLocaleString()} chars)… `);
+    const buf = await generateAudio(text, voiceFor(lang));
+    fs.writeFileSync(path.join(AUDIO_DIR, `${audioBaseName(film.id, age, lang)}.mp3`), buf);
     console.log(`${(buf.length / 1024 / 1024).toFixed(1)} MB`);
   }
 

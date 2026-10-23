@@ -17,6 +17,7 @@ import { useProfiles } from "../state/ProfileContext";
 import { COLLECTIONS, getBundledStories, toGeneratedStory, pickTonight, buildQueue } from "../data/catalog";
 import { getJSON, setJSON, STORAGE_KEYS } from "../utils/storage";
 import { ageLabel } from "../constants/ageRanges";
+import { languageLabel, DEFAULT_LANGUAGE } from "../constants/languages";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
@@ -30,6 +31,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { kids, activeKid, setActiveKid, recentIds } = useProfiles();
   const ageRange = activeKid?.ageRange ?? "6-8";
+  const language = activeKid?.language ?? DEFAULT_LANGUAGE;
 
   const [savedGenerated, setSavedGenerated] = useState([]);
   const [queue, setQueue] = useState(null); // non-null = player open
@@ -39,7 +41,7 @@ export default function HomeScreen() {
     getJSON(STORAGE_KEYS.GENERATED_STORIES, []).then(setSavedGenerated);
   }, []);
 
-  const bundled = useMemo(() => getBundledStories(ageRange), [ageRange]);
+  const bundled = useMemo(() => getBundledStories(ageRange, language), [ageRange, language]);
   const generated = useMemo(() => savedGenerated.map(toGeneratedStory), [savedGenerated]);
   const tonight = useMemo(
     () => pickTonight(bundled, { seed: activeKid?.id ?? "", recentIds }),
@@ -93,7 +95,10 @@ export default function HomeScreen() {
               <Text style={styles.greeting} numberOfLines={1}>
                 {greetingFor(activeKid?.name)} <Text style={styles.moon}>🌙</Text>
               </Text>
-              <Text style={styles.subhead}>Bedtime stories for ages {ageLabel(ageRange)}</Text>
+              <Text style={styles.subhead}>
+                Bedtime stories for ages {ageLabel(ageRange)}
+                {language !== "en" ? ` · ${languageLabel(language)}` : ""}
+              </Text>
             </View>
             <Pressable
               onPress={() => setSettingsOpen(true)}
@@ -145,7 +150,7 @@ export default function HomeScreen() {
             />
           ))}
 
-          <GenerateStory ageRange={ageRange} kidName={activeKid?.name} onGenerated={handleGenerated} />
+          <GenerateStory ageRange={ageRange} language={language} kidName={activeKid?.name} onGenerated={handleGenerated} />
 
           <Text style={styles.footnote}>
             Gentle retellings inspired by much-loved Indian films. Not affiliated with the films or their studios.

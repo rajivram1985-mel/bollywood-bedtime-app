@@ -15,6 +15,8 @@ import Animated, {
 } from "react-native-reanimated";
 import NightSky from "../components/NightSky";
 import { AGE_RANGES } from "../constants/ageRanges";
+import { STORY_LANGUAGES, DEFAULT_LANGUAGE } from "../constants/languages";
+import LanguageSegmented from "../components/LanguageSegmented";
 import { useProfiles } from "../state/ProfileContext";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
@@ -102,11 +104,12 @@ export default function OnboardingScreen() {
   const { addKid } = useProfiles();
   const [name, setName] = useState("");
   const [selectedAge, setSelectedAge] = useState(null);
+  const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
 
   // Adding the first child is what completes onboarding (App switches to Home).
   const handleComplete = () => {
     if (!selectedAge) return;
-    addKid({ name, ageRange: selectedAge });
+    addKid({ name, ageRange: selectedAge, language });
   };
 
   const canFinish = !!selectedAge;
@@ -195,6 +198,14 @@ export default function OnboardingScreen() {
                 );
               })}
             </View>
+
+            <Animated.View entering={FadeInUp.duration(500).delay(640)} style={styles.languageBlock}>
+              <Text style={styles.languageLabel}>Stories in</Text>
+              <LanguageSegmented value={language} onChange={setLanguage} />
+              <Text style={styles.languageHint}>
+                {STORY_LANGUAGES.find((l) => l.key === language)?.description}
+              </Text>
+            </Animated.View>
           </View>
 
           {/* Primary CTA */}
@@ -344,6 +355,25 @@ const styles = StyleSheet.create({
   nameWrap: {
     width: "100%",
     marginBottom: 16,
+  },
+  languageBlock: {
+    width: "100%",
+    marginTop: 20,
+    gap: 8,
+  },
+  languageLabel: {
+    fontFamily: fonts.bodyBold,
+    fontSize: 12,
+    letterSpacing: 1.1,
+    textTransform: "uppercase",
+    color: colors.textTertiary,
+    textAlign: "center",
+  },
+  languageHint: {
+    fontFamily: fonts.body,
+    fontSize: 13,
+    color: colors.textTertiary,
+    textAlign: "center",
   },
   nameInput: {
     minHeight: 52,

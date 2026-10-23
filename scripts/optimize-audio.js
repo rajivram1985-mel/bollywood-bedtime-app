@@ -13,7 +13,7 @@ const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
 const ffmpeg = require("ffmpeg-static");
-const { writeAudioManifest } = require("./lib/audio-manifest");
+const { writeAudioManifest, parseAudioName } = require("./lib/audio-manifest");
 
 const AUDIO_DIR = path.join(__dirname, "..", "assets", "audio");
 const LEGACY_AGE = "6-8"; // the original bundled stories were all written for 6-8
@@ -21,7 +21,7 @@ const LEGACY_AGE = "6-8"; // the original bundled stories were all written for 6
 for (const file of fs.readdirSync(AUDIO_DIR)) {
   if (!file.endsWith(".mp3")) continue;
   const base = file.replace(/\.mp3$/, "");
-  const target = /-(3-5|6-8|9-12)$/.test(base) ? base : `${base}-${LEGACY_AGE}`;
+  const target = parseAudioName(file) ? base : `${base}-${LEGACY_AGE}`;
   const src = path.join(AUDIO_DIR, file);
   const out = path.join(AUDIO_DIR, `${target}.m4a`);
 

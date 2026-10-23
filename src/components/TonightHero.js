@@ -3,6 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import StoryArt from "./StoryArt";
 import { PlayIcon } from "./Icons";
 import { ageLabel } from "../constants/ageRanges";
+import { languageLabel } from "../constants/languages";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/typography";
 
@@ -41,6 +42,7 @@ export default function TonightHero({ story, kidName, onPlay }) {
           </LinearGradient>
           <Text style={styles.meta}>
             {story.minutes} min · Ages {ageLabel(story.ageRange)}
+            {story.language && story.language !== "en" ? ` · ${languageLabel(story.language)}` : ""}
           </Text>
         </View>
       </View>
@@ -111,5 +113,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodySemiBold,
     fontSize: 13,
     color: colors.textSecondary,
+    flexShrink: 1,
   },
 });

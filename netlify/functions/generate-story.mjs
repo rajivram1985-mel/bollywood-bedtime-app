@@ -21,7 +21,7 @@ export default async (req) => {
     return json({ error: "Invalid JSON body" }, 400);
   }
 
-  const { movieName, ageRange = "6-8" } = body;
+  const { movieName, ageRange = "6-8", language = "en" } = body;
   if (!movieName || typeof movieName !== "string") {
     return json({ error: "movieName is required" }, 400);
   }
@@ -34,7 +34,7 @@ NOT_A_FILM: <one short, friendly sentence explaining why, addressed to the paren
 
 Otherwise, ignore the above and proceed with the bedtime story below.
 
-${buildStoryPrompt(movieName, ageRange)}`;
+${buildStoryPrompt(movieName, ageRange, language)}`;
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -45,7 +45,8 @@ ${buildStoryPrompt(movieName, ageRange)}`;
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
-      max_tokens: 4096,
+      // Devanagari costs several times more tokens per word than English.
+      max_tokens: language === "hi" ? 12000 : 4096,
       stream: true,
       messages: [{ role: "user", content: prompt }],
     }),

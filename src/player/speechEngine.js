@@ -20,7 +20,8 @@ const CHARS_PER_SEC = 13.5;
 export function splitIntoChunks(text) {
   const sentences = text
     .replace(/\s+/g, " ")
-    .split(/(?<=[.!?…])\s+/)
+    // । and ॥ are the Devanagari full stops.
+    .split(/(?<=[.!?…।॥])\s+/)
     .filter(Boolean)
     // Hard-split the rare run-on sentence at commas, then spaces.
     .flatMap((s) => (s.length <= MAX_CHUNK ? [s] : s.match(new RegExp(`.{1,${MAX_CHUNK}}(?:[,;]\\s|\\s|$)`, "g")) || [s]));
@@ -40,24 +41,34 @@ export function splitIntoChunks(text) {
 }
 
 // ─── Voice selection ─────────────────────────────────────────────────────────
-// Indian-English voices first (iOS ships Rishi/Veena, Edge ships Neerja/Prabhat),
-// then natural/enhanced British, Australian and US voices.
+// English (and English-with-Hindi-words): Indian-English voices first (iOS
+// ships Rishi/Veena, Edge ships Neerja/Prabhat), then natural/enhanced British,
+// Australian and US voices. Hindi: hi-IN voices only (iOS Lekha, Android
+// Google Hindi, Edge Swara/Madhur) — an English voice can't read Devanagari.
 
-const LANG_ORDER = ["en-IN", "en-GB", "en-AU", "en-US"];
+const VOICE_PREFS = {
+  en: { family: "en", order: ["en-IN", "en-GB", "en-AU", "en-US"], platformLang: "en-IN" },
+  "en-hi": { family: "en", order: ["en-IN", "en-GB", "en-AU", "en-US"], platformLang: "en-IN" },
+  hi: { family: "hi", order: ["hi-IN"], platformLang: "hi-IN" },
+};
 
-function scoreVoice({ lang, name = "", quality = "" }) {
+export class NoVoiceError extends Error {}
+
+function scoreVoice({ lang, name = "", quality = "" }, prefs) {
   const l = (lang || "").replace("_", "-");
-  const li = LANG_ORDER.findIndex((p) => l.startsWith(p));
-  if (!l.startsWith("en")) return -1;
-  const langScore = li < 0 ? 0 : (LANG_ORDER.length - li) * 10;
+  if (!l.startsWith(prefs.family)) return -1;
+  const li = prefs.order.findIndex((p) => l.startsWith(p));
+  const langScore = li < 0 ? 0 : (prefs.order.length - li) * 10;
   const natural = /natural|enhanced|premium|neural|online|google/i.test(name + quality) ? 5 : 0;
   return langScore + natural;
 }
 
-let voicePromise = null;
-function getPreferredVoice() {
-  if (voicePromise) return voicePromise;
-  voicePromise = (async () => {
+const voicePromises = {};
+function getPreferredVoice(language) {
+  const prefs = VOICE_PREFS[language] ?? VOICE_PREFS.en;
+  if (voicePromises[language]) return voicePromises[language];
+  voicePromises[language] = (async () => {
+    let candidates;
     if (IS_WEB) {
       const synth = typeof window !== "undefined" ? window.speechSynthesis : null;
       if (!synth) return null;
@@ -69,15 +80,15 @@ function getPreferredVoice() {
           setTimeout(done, 1500);
         });
       }
-      return [...voices].sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] || null;
+      candidates = voices.map((v) => ({ v, s: scoreVoice({ lang: v.lang, name: v.name }, prefs) }));
+    } else {
+      const voices = await Speech.getAvailableVoicesAsync().catch(() => []);
+      candidates = voices.map((v) => ({ v, s: scoreVoice({ lang: v.language, name: v.name, quality: v.quality }, prefs) }));
     }
-    const voices = await Speech.getAvailableVoicesAsync().catch(() => []);
-    const best = voices
-      .map((v) => ({ v, s: scoreVoice({ lang: v.language, name: v.name, quality: v.quality }) }))
-      .sort((a, b) => b.s - a.s)[0];
+    const best = candidates.sort((a, b) => b.s - a.s)[0];
     return best && best.s >= 0 ? best.v : null;
   })();
-  return voicePromise;
+  return voicePromises[language];
 }
 
 export function isSpeechSupported() {
@@ -94,6 +105,7 @@ export function createSpeechEngine({ onStatus }) {
   let playing = false;
   let token = 0; // bumps on every play/pause/seek so stale callbacks are ignored
   let voice = null;
+  let prefs = VOICE_PREFS.en;
 
   const emit = (extra = {}) =>
     onStatus({
@@ -145,7 +157,7 @@ export function createSpeechEngine({ onStatus }) {
         rate: RATE,
         pitch: PITCH,
         voice: voice?.identifier,
-        language: voice?.language ?? "en-IN",
+        language: voice?.language ?? prefs.platformLang,
         onDone: next,
         onError: next,
       });
@@ -155,7 +167,8 @@ export function createSpeechEngine({ onStatus }) {
   return {
     kind: "speech",
 
-    async load(text) {
+    async load(text, language = "en") {
+      prefs = VOICE_PREFS[language] ?? VOICE_PREFS.en;
       token++;
       cancelPlatform();
       chunks = splitIntoChunks(text);
@@ -169,7 +182,10 @@ export function createSpeechEngine({ onStatus }) {
       index = 0;
       playing = false;
       if (!isSpeechSupported()) throw new Error("Speech isn't supported in this browser");
-      voice = await getPreferredVoice();
+      voice = await getPreferredVoice(language);
+      // Browsers silently mangle Devanagari with an English voice. On native,
+      // passing language "hi-IN" lets the OS use (or offer to download) Hindi.
+      if (!voice && IS_WEB && prefs.family !== "en") throw new NoVoiceError(language);
       emit();
     },
 
